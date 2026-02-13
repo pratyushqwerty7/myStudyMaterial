@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyVault Pro | Pratyush</title>
+    <title>SVault | Pratyush</title>
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/pratyushqwerty7/myStudyMaterial/main/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -26,20 +27,32 @@
         #folder-loader { z-index: 9999; display: none; }
         .spinner { width: 45px; height: 45px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR FIXES --- */
         nav { position: fixed; left: 0; top: 0; width: var(--sidebar-width); height: 100vh; background: var(--sidebar-bg); border-right: 1px solid var(--border); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; }
-        nav.open { width: var(--sidebar-expanded); }
-        .hamburger-btn { min-width: 45px; height: 45px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: none; }
-        nav.open .hamburger-btn { margin: 20px; }
-        .nav-section-label { font-size: 0.65rem; font-weight: 800; color: var(--accent); padding: 20px 25px 5px; text-transform: uppercase; letter-spacing: 1px; display: none; white-space: nowrap; }
-        nav.open .nav-section-label { display: block; }
-        .nav-links { flex-grow: 1; padding: 10px; list-style: none; overflow-y: auto; }
-        .nav-links li { padding: 12px 25px; border-radius: 12px; cursor: pointer; margin-bottom: 4px; display: flex; align-items: center; gap: 25px; color: var(--text-dim); transition: 0.2s; }
-        .nav-links li span { opacity: 0; transition: 0.2s; white-space: nowrap; font-weight: 600; }
-        nav.open .nav-links li span { opacity: 1; }
-        .nav-links li:hover, .nav-links li.active { background: var(--accent); color: white; }
+        nav.open { width: var(--sidebar-expanded); box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
+        
+        /* The Hamburger Box Fix */
+        .hamburger-btn { min-width: 45px; height: 45px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: none; transition: 0.3s; }
+        nav.open .hamburger-btn { margin: 20px 20px 20px auto; width: 45px; } /* Stays small or aligns right when open */
 
-        /* --- CONTENT --- */
+        .nav-links { flex-grow: 1; padding: 10px; list-style: none; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+        nav.open .nav-links { align-items: stretch; }
+
+        .nav-links li { 
+            width: 50px; height: 50px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; 
+            display: flex; align-items: center; justify-content: center; transition: 0.2s; color: var(--text-dim);
+            position: relative;
+        }
+        nav.open .nav-links li { width: 100%; justify-content: flex-start; padding: 0 15px; gap: 20px; }
+        
+        .nav-links li span { display: none; font-weight: 600; white-space: nowrap; font-size: 0.9rem; }
+        nav.open .nav-links li span { display: block; }
+        .nav-links li:hover, .nav-links li.active { background: rgba(59, 130, 246, 0.08); }
+
+        .nav-section-label { font-size: 0.6rem; font-weight: 800; color: var(--accent); padding: 15px 0 5px; text-transform: uppercase; letter-spacing: 1px; display: none; }
+        nav.open .nav-section-label { display: block; padding-left: 15px; }
+
+        /* --- MAIN CONTENT --- */
         main { flex: 1; margin-left: var(--sidebar-width); padding: 40px; transition: 0.4s; }
         .hero-container { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 30px; }
         .title-wrapper { display: flex; align-items: center; gap: 15px; }
@@ -67,14 +80,12 @@
         .mode-grid .icon-box { font-size: 3rem; margin-bottom: 15px; }
         .mode-grid .btn-group { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 10px; margin-top: 20px; }
 
-        .action-btn { border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border-radius: 12px; }
+        .action-btn { border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border-radius: 12px; text-decoration: none; }
         .mode-list .action-btn { padding: 10px 15px; font-size: 0.75rem; }
         .mode-grid .action-btn { padding: 14px; font-size: 0.8rem; }
         .dl-btn { background: #64748b !important; }
 
-        .file-type-badge { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; display: block; }
-
-        /* --- MODALS --- */
+        /* --- MODALS & SCREENS --- */
         #file-view-screen { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; padding: 40px; overflow-y: auto; }
         #file-view-screen.active { display: block; }
         #media-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
@@ -82,15 +93,21 @@
         #pdf-screen { position: fixed; inset: 0; background: var(--bg); z-index: 6000; display: none; flex-direction: column; }
         .close-media { position: absolute; top: 30px; right: 30px; font-size: 2.5rem; color: white; cursor: pointer; }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            main { padding: 20px; margin-left: var(--sidebar-width); }
+            #hero-title { font-size: 1.8rem; }
+            .accent-line { height: 30px; }
+            .mode-list .card { flex-direction: column; align-items: flex-start; padding: 15px; }
+            .mode-list .btn-group { width: 100%; margin-top: 15px; }
+        }
     </style>
 </head>
-<body>
+<body onclick="closeSidebarOnEmpty(event)">
 
     <div id="page-entrance-loader"><div class="spinner"></div></div>
     <div id="folder-loader"><div class="spinner"></div></div>
 
-    <nav id="sidebar">
+    <nav id="sidebar" onclick="event.stopPropagation()">
         <button class="hamburger-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
         <div class="nav-links">
             <li class="active" onclick="filterBy('all', this)"><i class="fas fa-th-large"></i> <span>All Library</span></li>
@@ -152,19 +169,39 @@
         let releasesStore = [];
         let viewMode = 'list';
         let currentFilter = 'all';
+        let currentReleaseData = null;
         const colors = ['#FF4D4D', '#3B82F6', '#10B981', '#FACC15', '#F97316', '#A855F7'];
 
-        window.addEventListener('load', () => { setTimeout(() => { document.getElementById('page-entrance-loader').style.display = 'none'; }, 500); });
+        window.addEventListener('load', () => { 
+            setTimeout(() => { document.getElementById('page-entrance-loader').style.display = 'none'; }, 500); 
+            applySidebarColors();
+            fetchLibrary();
+        });
+
+        function applySidebarColors() {
+            document.querySelectorAll('.nav-links li i').forEach((icon, index) => {
+                icon.style.color = colors[index % colors.length];
+            });
+        }
+
         function toggleNav() { document.getElementById('sidebar').classList.toggle('open'); }
+
+        // Smart Sidebar Close
+        function closeSidebarOnEmpty(e) {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        }
 
         function toggleViewMode(mode, el) {
             viewMode = mode;
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            // This fix ensures both main and folder toggles stay in sync
             document.querySelectorAll(`.fa-${mode === 'list' ? 'list' : 'th-large'}`).forEach(b => b.classList.add('active'));
             document.querySelectorAll('.content-container').forEach(c => c.className = `content-container mode-${mode}`);
+            if (currentReleaseData) renderFiles(currentReleaseData);
             renderFolders(currentFilter);
-            const openRel = releasesStore.find(r => r.name === document.getElementById('current-folder-title').innerText);
-            if(openRel) renderFiles(openRel);
         }
 
         async function fetchLibrary() {
@@ -184,16 +221,21 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.style[viewMode === 'grid' ? 'borderTop' : 'borderLeft'] = `6px solid ${color}`;
-                card.onclick = () => { document.getElementById('folder-loader').style.display = 'flex'; setTimeout(() => { document.getElementById('folder-loader').style.display = 'none'; openFolder(rel); }, 500); };
+                card.onclick = () => { openFolder(rel); };
                 card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="card-text-content"><h3 style="font-weight:800;">${rel.name}</h3></div>`;
                 grid.appendChild(card);
             });
         }
 
         function openFolder(release) {
-            document.getElementById('current-folder-title').innerText = release.name;
-            renderFiles(release);
-            document.getElementById('file-view-screen').classList.add('active');
+            document.getElementById('folder-loader').style.display = 'flex';
+            currentReleaseData = release;
+            setTimeout(() => {
+                document.getElementById('folder-loader').style.display = 'none';
+                document.getElementById('current-folder-title').innerText = release.name;
+                renderFiles(release);
+                document.getElementById('file-view-screen').classList.add('active');
+            }, 500);
         }
 
         function renderFiles(release) {
@@ -209,33 +251,30 @@
 
                 const item = document.createElement('div');
                 item.className = 'card';
-                item.innerHTML = `
-                    <div class="icon-box" style="color:${color}"><i class="fas ${icon}"></i></div>
-                    <div class="card-text-content">
-                        <span class="file-type-badge" style="color:${color}">${badge}</span>
-                        <h3 style="font-size:0.9rem; font-weight:700;">${asset.name}</h3>
-                    </div>
-                    <div class="btn-group">
-                        ${canView ? `<button class="action-btn" style="background:${color}" onclick="event.stopPropagation(); handleFile('${asset.browser_download_url}', '${type}', '${asset.name}')"><i class="fas fa-eye"></i> VIEW</button>` : ''}
-                        <a href="${asset.browser_download_url}" download class="action-btn dl-btn" style="${!canView ? 'width:100%; grid-column: span 2;' : ''}" onclick="event.stopPropagation();"><i class="fas fa-download"></i> ${!canView ? 'DOWNLOAD' : ''}</a>
-                    </div>`;
+                item.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas ${icon}"></i></div><div class="card-text-content"><span class="file-type-badge" style="color:${color}">${badge}</span><h3 style="font-size:0.9rem; font-weight:700; word-break: break-all;">${asset.name}</h3></div><div class="btn-group">${canView ? `<button class="action-btn" style="background:${color}" onclick="event.stopPropagation(); handleFile('${asset.browser_download_url}', '${type}', '${asset.name}')"><i class="fas fa-eye"></i> VIEW</button>` : ''}<a href="${asset.browser_download_url}" download class="action-btn dl-btn" onclick="event.stopPropagation();"><i class="fas fa-download"></i></a></div>`;
                 display.appendChild(item);
             });
         }
 
         function handleFile(url, type, name) {
             const content = document.getElementById('media-content');
-            if (type === 'video') { content.innerHTML = `<video src="${url}" controls autoplay></video>`; document.getElementById('media-modal').style.display = 'flex'; }
-            else if (type === 'image') { content.innerHTML = `<img src="${url}" alt="${name}">`; document.getElementById('media-modal').style.display = 'flex'; }
+            if (type === 'video') { content.innerHTML = `<video src="${url}" controls autoplay style="width:100%"></video>`; document.getElementById('media-modal').style.display = 'flex'; }
+            else if (type === 'image') { content.innerHTML = `<img src="${url}" alt="${name}" style="width:100%">`; document.getElementById('media-modal').style.display = 'flex'; }
             else if (type === 'pdf') { document.getElementById('pdf-title').innerText = name; document.getElementById('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`; document.getElementById('pdf-screen').style.display = 'flex'; }
         }
 
         function closeMedia() { document.getElementById('media-modal').style.display = 'none'; document.getElementById('media-content').innerHTML = ''; }
-        function closePdf() { document.getElementById('pdf-screen').style.display = 'none'; }
-        function closeFolder() { document.getElementById('file-view-screen').classList.remove('active'); }
-        function filterBy(tag, el) { document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active')); el.classList.add('active'); renderFolders(tag); }
-        function handleGlobalSearch(q) { document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'); }
-        fetchLibrary();
+        function closePdf() { document.getElementById('pdf-screen').style.display = 'none'; document.getElementById('pdf-frame').src = ''; }
+        function closeFolder() { document.getElementById('file-view-screen').classList.remove('active'); currentReleaseData = null; }
+        function filterBy(tag, el) { 
+            document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active')); 
+            el.classList.add('active'); 
+            renderFolders(tag); 
+            if(window.innerWidth < 768) toggleNav(); 
+        }
+        function handleGlobalSearch(q) { 
+            document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'); 
+        }
     </script>
 </body>
 </html>
