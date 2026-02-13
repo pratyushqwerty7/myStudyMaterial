@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pratyush's Study Vault</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { text-align: center; padding: 2rem 0; }
+        
+        /* Search Bar */
+        #searchBar {
+            width: 100%; padding: 12px; border-radius: 8px; border: none;
+            background: var(--card); color: white; margin-bottom: 20px; font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+        
+        .release-tag { background: var(--primary); font-size: 12px; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; display: inline-block; }
+        .file-name { font-size: 1.1rem; font-weight: 600; margin: 10px 0; word-break: break-all; }
+        
+        video { width: 100%; border-radius: 8px; margin-top: 10px; background: #000; border: 1px solid #475569; }
+        .btn { display: block; text-align: center; background: #334155; color: white; padding: 10px; border-radius: 6px; text-decoration: none; margin-top: 15px; transition: 0.3s; }
+        .btn:hover { background: var(--primary); }
+        
+        #loader { text-align: center; font-size: 1.2rem; margin-top: 50px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📚 My Study Material</h1>
+        <p>Managed by pratyushqwerty7</p>
+    </header>
+
+    <input type="text" id="searchBar" placeholder="Search for a topic, subject, or file name..." onkeyup="filterFiles()">
+
+    <div id="loader">Scanning GitHub Releases...</div>
+    <div class="grid" id="materials-list"></div>
+</div>
+
+<script>
+    const GITHUB_USER = 'pratyushqwerty7'; 
+    const REPO_NAME = 'myStudyMaterial';
+
+    async function fetchMaterials() {
+        const list = document.getElementById('materials-list');
+        const loader = document.getElementById('loader');
+        
+        try {
+            const response = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/releases`);
+            const releases = await response.json();
+            loader.style.display = 'none';
+
+            releases.forEach(release => {
+                release.assets.forEach(asset => {
+                    const isVideo = asset.name.toLowerCase().match(/\.(mp4|mkv|webm)$/);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-name', asset.name.toLowerCase() + " " + release.name.toLowerCase());
+                    
+                    card.innerHTML = `
+                        <span class="release-tag">${release.name}</span>
+                        <div class="file-name">${asset.name}</div>
+                        ${isVideo ? `
+                            <video controls preload="none">
+                                <source src="${asset.browser_download_url}" type="video/mp4">
+                            </video>
+                        ` : ''}
+                        <a href="${asset.browser_download_url}" class="btn" target="_blank">
+                            ${isVideo ? 'Download / Fullscreen' : 'Open Document'}
+                        </a>
+                    `;
+                    list.appendChild(card);
+                });
+            });
+        } catch (error) {
+            loader.innerHTML = "Error fetching data. Make sure the repo is public and has releases.";
+        }
+    }
+
+    function filterFiles() {
+        const query = document.getElementById('searchBar').value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const text = card.getAttribute('data-name');
+            card.style.display = text.includes(query) ? 'block' : 'none';
+        });
+    }
+
+    fetchMaterials();
+</script>
+
+</body>
+</html>
+
+
