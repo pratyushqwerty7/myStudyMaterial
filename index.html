@@ -3,274 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVault | Pratyush</title>
+    <title>SVault Pro | Pratyush</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/pratyushqwerty7/myStudyMaterial/main/logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root { 
-            --bg: #f8fafc; --sidebar-bg: #ffffff; --accent: #3b82f6; 
-            --card-bg: #ffffff; --text-main: #0f172a; --text-dim: #64748b; 
-            --border: rgba(0,0,0,0.08); --sidebar-width: 80px; --sidebar-expanded: 260px;
+            --bg: #f8fafc; --side: #ffffff; --accent: #3b82f6; --text: #0f172a; --dim: #64748b; 
+            --border: rgba(0,0,0,0.06); --side-w: 75px; --side-open: 260px;
+            --shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #050b18; --sidebar-bg: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); 
-                --text-main: #ffffff; --text-dim: #94a3b8; --border: rgba(255,255,255,0.1);
-            }
+            :root { --bg: #020617; --side: #0f172a; --text: #f8fafc; --dim: #94a3b8; --border: rgba(255,255,255,0.08); }
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); display: flex; transition: 0.3s; min-height: 100vh; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow: hidden; }
 
-        /* --- LOADERS --- */
-        #page-entrance-loader, #folder-loader { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        #folder-loader { z-index: 9999; display: none; }
-        .spinner { width: 45px; height: 45px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-
-        /* --- SIDEBAR --- */
-        nav { position: fixed; left: 0; top: 0; width: var(--sidebar-width); height: 100vh; background: var(--sidebar-bg); border-right: 1px solid var(--border); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; }
-        nav.open { width: var(--sidebar-expanded); box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
-        .hamburger-btn { min-width: 45px; height: 45px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: none; }
-        .nav-links { flex-grow: 1; padding: 10px; list-style: none; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
-        nav.open .nav-links { align-items: stretch; }
-        .nav-links li { width: 50px; height: 50px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: var(--text-dim); }
-        nav.open .nav-links li { width: 100%; justify-content: flex-start; padding: 0 15px; gap: 20px; }
-        .nav-links li span { display: none; font-weight: 600; white-space: nowrap; font-size: 0.9rem; }
-        nav.open .nav-links li span { display: block; }
-        .nav-links li:hover, .nav-links li.active { background: rgba(59, 130, 246, 0.08); }
-        .nav-section-label { font-size: 0.6rem; font-weight: 800; color: var(--accent); padding: 15px 0 5px; text-transform: uppercase; letter-spacing: 1px; display: none; }
-        nav.open .nav-section-label { display: block; padding-left: 15px; }
-
-        /* --- CONTENT --- */
-        main { flex: 1; margin-left: var(--sidebar-width); padding: 40px; transition: 0.4s; }
-        .hero-container { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 30px; }
-        .title-wrapper { display: flex; align-items: center; gap: 15px; }
-        .accent-line { width: 6px; height: 45px; background: var(--accent); border-radius: 10px; }
-        #hero-title { font-size: 3rem; font-weight: 800; }
-
-        .controls-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .control-group { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; }
-        .view-btn { cursor: pointer; color: var(--text-dim); transition: 0.2s; font-size: 1.1rem; }
-        .view-btn.active { color: var(--accent); }
-        .search-input { background: none; border: none; outline: none; color: var(--text-main); font-weight: 600; min-width: 180px; }
-
-        .content-container { display: grid; gap: 15px; transition: 0.3s; }
-        .mode-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-        .mode-list { grid-template-columns: 1fr; }
-
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; transition: 0.3s; cursor: pointer; display: flex; overflow: hidden; }
-        .mode-list .card { flex-direction: row; align-items: center; padding: 12px 25px; }
-        .mode-list .icon-box { font-size: 1.5rem; margin-right: 20px; }
-        .mode-list .card-text-content { flex: 1; }
-        .mode-list .btn-group { display: flex; gap: 10px; }
-
-        .mode-grid .card { flex-direction: column; padding: 30px 20px; text-align: center; align-items: center; }
-        .mode-grid .icon-box { font-size: 3rem; margin-bottom: 15px; }
-        .mode-grid .btn-group { display: grid; grid-template-columns: 1fr; width: 100%; gap: 10px; margin-top: 20px; }
-
-        /* --- BUTTONS --- */
-        .action-btn { border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border-radius: 12px; text-decoration: none; padding: 12px 18px; font-size: 0.75rem; height: 42px; }
-        .dl-btn { background: #64748b !important; }
-        .zip-btn { background: #6366f1 !important; }
-        
-        .mode-list .zip-btn { width: auto; min-width: 160px; }
-        .mode-grid .zip-btn { width: 100%; }
-
-        /* --- MODALS & VIEWERS --- */
-        #file-view-screen { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; padding: 40px; overflow-y: auto; }
-        #file-view-screen.active { display: block; }
-        #media-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
-        #media-modal img, #media-modal video { max-width: 95%; max-height: 90vh; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        #pdf-screen { position: fixed; inset: 0; background: var(--bg); z-index: 6000; display: none; flex-direction: column; }
-        .close-media { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: white; cursor: pointer; z-index: 5001; }
-
-        @media (max-width: 768px) {
-            main { padding: 20px; margin-left: var(--sidebar-width); }
-            #hero-title { font-size: 1.8rem; }
-            .mode-list .card { flex-direction: column; align-items: flex-start; padding: 15px; }
-            .mode-list .btn-group { width: 100%; margin-top: 15px; }
-            .mode-grid { grid-template-columns: 1fr; }
+        /* --- LOADING ANIMATION --- */
+        #loader { 
+            position: fixed; inset: 0; background: rgba(248,250,252,0.8); backdrop-filter: blur(10px);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
+        @media (prefers-color-scheme: dark) { #loader { background: rgba(2,6,23,0.8); } }
+        .spinner { width: 50px; height: 50px; border: 5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s infinite linear; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- SIDEBAR & OVERLAY --- */
+        #overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(4px); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; 
+        }
+        #overlay.active { opacity: 1; pointer-events: auto; }
+
+        nav { 
+            position: fixed; left: 0; top: 0; width: var(--side-w); height: 100vh; 
+            background: var(--side); border-right: 1px solid var(--border); 
+            transition: var(--transition); z-index: 2000; display: flex; flex-direction: column; 
+        }
+        nav.expanded { width: var(--side-open); box-shadow: 20px 0 60px rgba(0,0,0,0.1); }
+        
+        .nav-btn { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: white; border: none; cursor: pointer; transition: 0.3s; }
+        .nav-btn:hover { transform: rotate(90deg); }
+
+        .nav-list { flex: 1; padding: 10px; list-style: none; overflow-y: auto; scrollbar-width: none; }
+        .nav-item { height: 50px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; padding: 0 15px; color: var(--dim); transition: 0.3s; white-space: nowrap; }
+        
+        /* Fixed icon visibility when active */
+        .nav-item.active { background: var(--accent); color: white !important; }
+        .nav-item.active i { color: white !important; } 
+
+        .nav-item i { min-width: 45px; text-align: center; font-size: 1.2rem; margin-left: -10px; }
+        .nav-item span { opacity: 0; font-weight: 700; margin-left: 15px; transition: 0.2s; }
+        nav.expanded .nav-item span { opacity: 1; }
+        
+        .nav-label { font-size: 0.65rem; font-weight: 900; color: var(--accent); padding: 20px 0 10px 15px; text-transform: uppercase; display: none; }
+        nav.expanded .nav-label { display: block; }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; margin-left: var(--side-w); padding: 40px 6%; width: calc(100% - var(--side-w)); overflow-y: auto; height: 100vh; transition: 0.3s; }
+        .header { text-align: center; margin-bottom: 40px; }
+        h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1.5px; }
+
+        .toolbar { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tool-panel { background: var(--side); border: 1px solid var(--border); padding: 10px 20px; border-radius: 18px; display: flex; align-items: center; gap: 15px; box-shadow: var(--shadow); }
+        .toggle-icon { cursor: pointer; color: var(--dim); font-size: 1.1rem; transition: 0.3s; padding: 5px; }
+        .toggle-icon.active { color: var(--accent); transform: scale(1.1); }
+        .search-bar { background: none; border: none; outline: none; color: var(--text); font-weight: 600; min-width: 200px; }
+
+        /* --- CARDS --- */
+        .stage { display: grid; gap: 20px; }
+        .stage-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        .stage-list { grid-template-columns: 1fr; }
+
+        .card { background: var(--side); border: 1px solid var(--border); border-radius: 24px; padding: 25px; display: flex; align-items: center; cursor: pointer; transition: 0.3s; position: relative; }
+        .card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
+        
+        .stage-grid .card { flex-direction: column; text-align: center; padding: 40px 25px; }
+        .stage-grid .icon-box { font-size: 5rem; margin-bottom: 25px; }
+        .stage-grid .info { padding: 0; margin-bottom: 25px; width: 100%; }
+        .stage-list .icon-box { font-size: 2.5rem; }
+        .stage-list .info { flex: 1; padding: 0 25px; }
+        .info h3 { font-size: 1.1rem; font-weight: 800; }
+
+        .actions { display: flex; gap: 12px; }
+        .btn { height: 46px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; text-decoration: none; color: white; font-size: 0.85rem; }
+        .btn-v { background: var(--accent); padding: 0 20px; }
+        .btn-d { background: #475569; width: 46px; }
+        .btn-z { background: #6366f1; width: 100%; padding: 0 20px; }
+        
+        /* --- MOBILE FIX --- */
+        @media (max-width: 800px) {
+            main { padding: 25px 15px; }
+            .stage-list .card { flex-direction: column; text-align: center; }
+            .stage-list .actions { width: 100%; flex-direction: row; justify-content: center; }
+            .stage-list .btn-v { flex: 1; }
+            .stage-list .btn-z { width: 100%; }
+        }
+
+        #folder-view { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; padding: 40px 6%; overflow-y: auto; }
+        #viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; }
+        .viewer-box { width: 95%; height: 90vh; background: #000; border-radius: 24px; position: relative; overflow: hidden; }
+        .close-view { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; z-index: 5001; }
     </style>
 </head>
-<body onclick="closeSidebarOnEmpty(event)">
+<body>
 
-    <div id="page-entrance-loader"><div class="spinner"></div></div>
-    <div id="folder-loader"><div class="spinner"></div></div>
+    <div id="loader"><div class="spinner"></div><p style="margin-top:15px; font-weight:700; color:var(--accent)">Syncing Vault...</p></div>
+    <div id="overlay" onclick="toggleSide(false)"></div>
 
-    <nav id="sidebar" onclick="event.stopPropagation()">
-        <button class="hamburger-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
-        <div class="nav-links">
-            <li class="active" onclick="filterBy('all', this, event)"><i class="fas fa-th-large"></i> <span>All Library</span></li>
-            <div class="nav-section-label">School Level</div>
-            <li onclick="filterBy('class10', this, event)"><i class="fas fa-graduation-cap"></i> <span>Class 10</span></li>
-            <li onclick="filterBy('class11', this, event)"><i class="fas fa-book-open"></i> <span>Class 11</span></li>
-            <li onclick="filterBy('class12', this, event)"><i class="fas fa-university"></i> <span>Class 12</span></li>
-            <div class="nav-section-label">Competitive</div>
-            <li onclick="filterBy('jee11', this, event)"><i class="fas fa-atom"></i> <span>JEE 11th</span></li>
-            <li onclick="filterBy('jee12', this, event)"><i class="fas fa-rocket"></i> <span>JEE 12th</span></li>
-            <div class="nav-section-label">Extras</div>
-            <li onclick="filterBy('extra', this, event)"><i class="fas fa-plus-circle"></i> <span>Extra Resources</span></li>
+    <nav id="sidebar">
+        <button class="nav-btn" onclick="toggleSide()"><i class="fas fa-bars"></i></button>
+        <div class="nav-list">
+            <li class="nav-item active" onclick="setFilter('all', this)"><i class="fas fa-layer-group" style="color:#ff3e3e"></i> <span>All Vaults</span></li>
+            <div class="nav-label">Academic</div>
+            <li class="nav-item" onclick="setFilter('class10', this)"><i class="fas fa-graduation-cap" style="color:#3b82f6"></i> <span>Class 10</span></li>
+            <li class="nav-item" onclick="setFilter('class11', this)"><i class="fas fa-book-open" style="color:#10b981"></i> <span>Class 11</span></li>
+            <li class="nav-item" onclick="setFilter('class12', this)"><i class="fas fa-university" style="color:#f59e0b"></i> <span>Class 12</span></li>
+            <div class="nav-label">Competitive</div>
+            <li class="nav-item" onclick="setFilter('jee11', this)"><i class="fas fa-atom" style="color:#ef4444"></i> <span>JEE 11th</span></li>
+            <li class="nav-item" onclick="setFilter('jee12', this)"><i class="fas fa-rocket" style="color:#8b5cf6"></i> <span>JEE 12th</span></li>
+            <div class="nav-label">Extras</div>
+            <li class="nav-item" onclick="setFilter('extra', this)"><i class="fas fa-plus-circle" style="color:#ec4899"></i> <span>Extra Resources</span></li>
         </div>
     </nav>
 
-    <main>
-        <div class="hero-container">
-            <div class="title-wrapper"><div class="accent-line"></div><h1 id="hero-title">My Library</h1></div>
-            <div class="about-me">Pratyush • Class 10 • Age 16</div>
-        </div>
-        <div class="controls-bar">
-            <div class="control-group">
-                <i class="fas fa-list view-btn active" onclick="toggleViewMode('list', this)"></i>
-                <i class="fas fa-th-large view-btn" onclick="toggleViewMode('grid', this)"></i>
+    <main onclick="if(window.innerWidth < 1000) toggleSide(false)">
+        <div class="header"><h1>My Vault</h1><p style="color:var(--dim); font-weight:700;">Pratyush • Digital Library</p></div>
+        <div class="toolbar">
+            <div class="tool-panel">
+                <i class="fas fa-list toggle-icon" id="mode-list-main" onclick="updateMode('list', event)"></i>
+                <i class="fas fa-th-large toggle-icon" id="mode-grid-main" onclick="updateMode('grid', event)"></i>
             </div>
-            <div class="control-group"><i class="fas fa-search" style="color:var(--text-dim)"></i><input type="text" class="search-input" placeholder="Search..." oninput="handleGlobalSearch(this.value)"></div>
+            <div class="tool-panel"><i class="fas fa-search" style="color:var(--dim)"></i><input type="text" class="search-bar" id="main-search" placeholder="Search resources..." oninput="doSearch('main-stage', 'main-search')"></div>
         </div>
-        <div id="main-grid" class="content-container mode-list"></div>
+        <div id="main-stage" class="stage"></div>
     </main>
 
-    <div id="file-view-screen">
-        <div onclick="closeFolder()" style="cursor:pointer; color:var(--accent); font-weight:800; margin-bottom:20px;"><i class="fas fa-arrow-left"></i> BACK</div>
-        <h1 id="current-folder-title" style="margin-bottom:30px; text-align:center;"></h1>
-        <div class="controls-bar">
-            <div class="control-group">
-                <i class="fas fa-list view-btn active" onclick="toggleViewMode('list', this)"></i>
-                <i class="fas fa-th-large view-btn" onclick="toggleViewMode('grid', this)"></i>
+    <div id="folder-view">
+        <button onclick="closeFolder()" style="background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer; margin-bottom:25px;"><i class="fas fa-arrow-left"></i> BACK</button>
+        <h2 id="folder-title" style="font-size: 2.2rem; font-weight: 900; margin-bottom: 30px;"></h2>
+        <div class="toolbar" style="justify-content: flex-start;">
+            <div class="tool-panel">
+                <i class="fas fa-list toggle-icon" id="mode-list-folder" onclick="updateMode('list', event)"></i>
+                <i class="fas fa-th-large toggle-icon" id="mode-grid-folder" onclick="updateMode('grid', event)"></i>
             </div>
-            <div class="control-group"><i class="fas fa-search" style="color:var(--text-dim)"></i><input type="text" class="search-input" placeholder="Search files..." oninput="handleGlobalSearch(this.value)"></div>
+            <div class="tool-panel"><i class="fas fa-search" style="color:var(--dim)"></i><input type="text" class="search-bar" id="folder-search" placeholder="Search in folder..." oninput="doSearch('folder-stage', 'folder-search')"></div>
         </div>
-        <div id="folder-content-display" class="content-container mode-list"></div>
+        <div id="folder-stage" class="stage"></div>
     </div>
 
-    <div id="media-modal"><span class="close-media" onclick="closeMedia()">&times;</span><div id="media-content"></div></div>
-    <div id="pdf-screen">
-        <div style="padding:15px; background:var(--sidebar-bg); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <button onclick="closePdf()" style="font-weight:800; border:none; background:none; color:var(--text-main); cursor:pointer;">CLOSE</button>
-            <span id="pdf-title"></span>
-        </div>
-        <iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe>
-    </div>
+    <div id="viewer"><span class="close-view" onclick="closeMedia()">&times;</span><div class="viewer-box" id="viewer-content"></div></div>
 
     <script>
-        const USER = 'pratyushqwerty7';
-        const REPO = 'myStudyMaterial';
-        let releasesStore = [];
-        let viewMode = 'list';
-        let currentFilter = 'all';
-        let currentReleaseData = null;
-        const colors = ['#FF4D4D', '#3B82F6', '#10B981', '#FACC15', '#F97316', '#A855F7'];
+        const API = { user: 'pratyushqwerty7', repo: 'myStudyMaterial' };
+        let dataStore = [], currentMode = 'list', filterTag = 'all';
+        const palette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
 
-        window.addEventListener('load', () => { 
-            setTimeout(() => { document.getElementById('page-entrance-loader').style.display = 'none'; }, 500); 
-            applySidebarColors();
-            fetchLibrary();
-        });
+        function showLoad() { document.getElementById('loader').style.display = 'flex'; }
+        function hideLoad() { setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 600); }
 
-        function applySidebarColors() {
-            document.querySelectorAll('.nav-links li i').forEach((icon, index) => {
-                icon.style.color = colors[index % colors.length];
-            });
+        async function init() {
+            showLoad();
+            const resp = await fetch(`https://api.github.com/repos/${API.user}/${API.repo}/releases`);
+            dataStore = await resp.json();
+            updateMode('list');
+            hideLoad();
         }
 
-        function toggleNav() { document.getElementById('sidebar').classList.toggle('open'); }
-        function closeSidebarOnEmpty(e) { if (document.getElementById('sidebar').classList.contains('open')) document.getElementById('sidebar').classList.remove('open'); }
-
-        function toggleViewMode(mode, el) {
-            viewMode = mode;
-            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll(`.fa-${mode === 'list' ? 'list' : 'th-large'}`).forEach(b => b.classList.add('active'));
-            document.querySelectorAll('.content-container').forEach(c => c.className = `content-container mode-${mode}`);
-            if (currentReleaseData) renderFiles(currentReleaseData);
-            renderFolders(currentFilter);
-        }
-
-        async function fetchLibrary() {
-            const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases`);
-            releasesStore = await res.json();
-            renderFolders('all');
-        }
-
-        function renderFolders(filter) {
-            currentFilter = filter;
-            const grid = document.getElementById('main-grid');
-            grid.innerHTML = '';
-            let filtered = filter === 'all' ? releasesStore.filter(r => !r.tag_name.toLowerCase().includes('extra')) : releasesStore.filter(r => r.tag_name.toLowerCase().includes(filter));
-            filtered.forEach(rel => {
-                const color = colors[Math.floor(Math.random()*colors.length)];
+        function renderMain() {
+            const stage = document.getElementById('main-stage');
+            stage.className = `stage stage-${currentMode}`;
+            stage.innerHTML = '';
+            const filtered = filterTag === 'extra' ? dataStore.filter(r => r.tag_name.toLowerCase().includes('extra')) : (filterTag === 'all' ? dataStore.filter(r => !r.tag_name.toLowerCase().includes('extra')) : dataStore.filter(r => r.tag_name.toLowerCase().includes(filterTag)));
+            filtered.forEach((rel) => {
+                const color = palette[Math.floor(Math.random() * palette.length)];
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.style[viewMode === 'grid' ? 'borderTop' : 'borderLeft'] = `6px solid ${color}`;
-                card.onclick = () => { openFolder(rel); };
-                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="card-text-content"><h3 style="font-weight:800;">${rel.name}</h3></div>`;
-                grid.appendChild(card);
+                card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
+                card.onclick = () => openFolder(rel);
+                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="info"><h3>${rel.name}</h3><small style="color:var(--dim)">Vault</small></div>`;
+                stage.appendChild(card);
             });
         }
 
-        function openFolder(release) {
-            document.getElementById('folder-loader').style.display = 'flex';
-            currentReleaseData = release;
-            setTimeout(() => {
-                document.getElementById('folder-loader').style.display = 'none';
-                document.getElementById('current-folder-title').innerText = release.name;
-                renderFiles(release);
-                document.getElementById('file-view-screen').classList.add('active');
-            }, 500);
-        }
-
-        function renderFiles(release) {
-            const display = document.getElementById('folder-content-display');
-            display.innerHTML = '';
-            release.assets.forEach(asset => {
-                const name = asset.name.toLowerCase();
-                let type = 'file', icon = 'fa-file', badge = 'File', color = '#64748b', isZip = false;
-                if (name.match(/\.(mp4|mkv|webm)$/)) { type = 'video'; icon = 'fa-video'; badge = 'Video'; color = '#3b82f6'; }
-                else if (name.endsWith('.pdf')) { type = 'pdf'; icon = 'fa-file-pdf'; badge = 'PDF'; color = '#10b981'; }
-                else if (name.match(/\.(jpg|jpeg|png|webp|gif)$/)) { type = 'image'; icon = 'fa-image'; badge = 'Image'; color = '#f97316'; }
-                else if (name.match(/\.(zip|rar|7z)$/)) { isZip = true; icon = 'fa-file-archive'; badge = 'Archive'; color = '#a855F7'; }
-
-                const item = document.createElement('div');
-                item.className = 'card';
-                item.innerHTML = `
-                    <div class="icon-box" style="color:${color}"><i class="fas ${icon}"></i></div>
-                    <div class="card-text-content">
-                        <span class="file-type-badge" style="color:${color}; font-size: 0.6rem; font-weight: 800;">${badge}</span>
-                        <h3 style="font-size:0.9rem; font-weight:700;">${asset.name}</h3>
-                    </div>
-                    <div class="btn-group">
-                        ${isZip ? 
-                            `<a href="${asset.browser_download_url}" download class="action-btn zip-btn"><i class="fas fa-download"></i> DOWNLOAD ZIP</a>` : 
-                            `<button class="action-btn" style="background:${color}" onclick="event.stopPropagation(); handleFile('${asset.browser_download_url}', '${type}', '${asset.name}')"><i class="fas fa-eye"></i> VIEW</button>
-                             <a href="${asset.browser_download_url}" download class="action-btn dl-btn" onclick="event.stopPropagation();"><i class="fas fa-download"></i> DOWNLOAD</a>`
-                        }
-                    </div>`;
-                display.appendChild(item);
+        function openFolder(rel) {
+            showLoad();
+            const title = document.getElementById('folder-title'), stage = document.getElementById('folder-stage');
+            title.innerText = rel.name; stage.className = `stage stage-${currentMode}`; stage.innerHTML = '';
+            rel.assets.forEach(asset => {
+                const meta = getMeta(asset.name), color = palette[Math.floor(Math.random() * palette.length)];
+                const card = document.createElement('div'); card.className = 'card';
+                card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
+                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas ${meta.i}"></i></div><div class="info"><h3>${asset.name}</h3><small style="color:${color}; font-weight:800">${meta.t}</small></div><div class="actions">${meta.isZip ? `<a href="${asset.browser_download_url}" class="btn btn-z" onclick="event.stopPropagation()"><i class="fas fa-download"></i> ZIP DOWNLOAD</a>` : `<button class="btn btn-v" onclick="viewFile('${asset.browser_download_url}', '${meta.t}', event)">VIEW</button><a href="${asset.browser_download_url}" class="btn btn-d" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>`}</div>`;
+                stage.appendChild(card);
             });
+            document.getElementById('folder-view').style.display = 'block'; syncIcons(); hideLoad();
         }
 
-        // --- FULLSCREEN VIDEO & VIEW LOGIC ---
-        function handleFile(url, type, name) {
-            const content = document.getElementById('media-content');
-            if (type === 'video') { 
-                content.innerHTML = `<video src="${url}" controls autoplay playsinline style="width:100%; border-radius:12px;"></video>`; 
-                document.getElementById('media-modal').style.display = 'flex'; 
-            }
-            else if (type === 'image') { 
-                content.innerHTML = `<img src="${url}" alt="${name}" style="width:100%">`; 
-                document.getElementById('media-modal').style.display = 'flex'; 
-            }
-            else if (type === 'pdf') { 
-                document.getElementById('pdf-title').innerText = name; 
-                document.getElementById('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`; 
-                document.getElementById('pdf-screen').style.display = 'flex'; 
-            }
+        function getMeta(name) {
+            const n = name.toLowerCase();
+            if (n.match(/\.(mp4|mkv|webm)$/)) return { t: 'Video', i: 'fa-play-circle' };
+            if (n.endsWith('.pdf')) return { t: 'PDF', i: 'fa-file-pdf' };
+            if (n.match(/\.(png|jpg|jpeg|webp)$/)) return { t: 'Image', i: 'fa-image' };
+            if (n.match(/\.(zip|7z|rar)$/)) return { t: 'Archive', i: 'fa-file-archive', isZip: true };
+            return { t: 'File', i: 'fa-file' };
         }
 
-        function closeMedia() { document.getElementById('media-modal').style.display = 'none'; document.getElementById('media-content').innerHTML = ''; }
-        function closePdf() { document.getElementById('pdf-screen').style.display = 'none'; document.getElementById('pdf-frame').src = ''; }
-        function closeFolder() { document.getElementById('file-view-screen').classList.remove('active'); currentReleaseData = null; }
-        function filterBy(tag, el, event) { event.stopPropagation(); document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active')); el.classList.add('active'); renderFolders(tag); }
-        function handleGlobalSearch(q) { document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'); }
+        function viewFile(url, type, e) {
+            e.stopPropagation(); const box = document.getElementById('viewer-content'); box.innerHTML = '';
+            if (type === 'Video') box.innerHTML = `<video src="${url}" controls autoplay style="width:100%; height:100%"></video>`;
+            else if (type === 'PDF') box.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" style="width:100%; height:100%; border:none;"></iframe>`;
+            else box.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center;"><img src="${url}" style="max-width:95%; max-height:95%; object-fit:contain;"></div>`;
+            document.getElementById('viewer').style.display = 'flex';
+        }
+
+        function toggleSide(force) {
+            const nav = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const isExpanding = force !== undefined ? force : !nav.classList.contains('expanded');
+            
+            nav.classList.toggle('expanded', isExpanding);
+            overlay.classList.toggle('active', isExpanding);
+        }
+
+        function setFilter(tag, el) { 
+            filterTag = tag; 
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); 
+            el.classList.add('active'); 
+            renderMain(); 
+            if(window.innerWidth < 1000) toggleSide(false);
+        }
+
+        function updateMode(m, e) {
+            if(e) e.stopPropagation(); currentMode = m; renderMain();
+            const folderTitle = document.getElementById('folder-title').innerText;
+            if (folderTitle) { const currentRel = dataStore.find(r => r.name === folderTitle); if(currentRel) openFolder(currentRel); }
+            syncIcons();
+        }
+
+        function syncIcons() {
+            const isGrid = currentMode === 'grid';
+            ['mode-list-main', 'mode-list-folder'].forEach(id => document.getElementById(id).classList.toggle('active', !isGrid));
+            ['mode-grid-main', 'mode-grid-folder'].forEach(id => document.getElementById(id).classList.toggle('active', isGrid));
+        }
+
+        function doSearch(stageId, inputId) {
+            const q = document.getElementById(inputId).value.toLowerCase();
+            document.getElementById(stageId).querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none');
+        }
+        function closeFolder() { document.getElementById('folder-view').style.display = 'none'; document.getElementById('folder-title').innerText = ''; }
+        function closeMedia() { document.getElementById('viewer').style.display = 'none'; document.getElementById('viewer-content').innerHTML = ''; }
+
+        init();
     </script>
 </body>
 </html>
