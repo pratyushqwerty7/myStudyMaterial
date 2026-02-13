@@ -27,38 +27,26 @@
         #folder-loader { z-index: 9999; display: none; }
         .spinner { width: 45px; height: 45px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
-        /* --- SIDEBAR FIXES --- */
+        /* --- SIDEBAR --- */
         nav { position: fixed; left: 0; top: 0; width: var(--sidebar-width); height: 100vh; background: var(--sidebar-bg); border-right: 1px solid var(--border); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; }
         nav.open { width: var(--sidebar-expanded); box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
-        
-        /* The Hamburger Box Fix */
-        .hamburger-btn { min-width: 45px; height: 45px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: none; transition: 0.3s; }
-        nav.open .hamburger-btn { margin: 20px 20px 20px auto; width: 45px; } /* Stays small or aligns right when open */
-
+        .hamburger-btn { min-width: 45px; height: 45px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: none; }
         .nav-links { flex-grow: 1; padding: 10px; list-style: none; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
         nav.open .nav-links { align-items: stretch; }
-
-        .nav-links li { 
-            width: 50px; height: 50px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; 
-            display: flex; align-items: center; justify-content: center; transition: 0.2s; color: var(--text-dim);
-            position: relative;
-        }
+        .nav-links li { width: 50px; height: 50px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: var(--text-dim); }
         nav.open .nav-links li { width: 100%; justify-content: flex-start; padding: 0 15px; gap: 20px; }
-        
         .nav-links li span { display: none; font-weight: 600; white-space: nowrap; font-size: 0.9rem; }
         nav.open .nav-links li span { display: block; }
         .nav-links li:hover, .nav-links li.active { background: rgba(59, 130, 246, 0.08); }
-
         .nav-section-label { font-size: 0.6rem; font-weight: 800; color: var(--accent); padding: 15px 0 5px; text-transform: uppercase; letter-spacing: 1px; display: none; }
         nav.open .nav-section-label { display: block; padding-left: 15px; }
 
-        /* --- MAIN CONTENT --- */
+        /* --- CONTENT --- */
         main { flex: 1; margin-left: var(--sidebar-width); padding: 40px; transition: 0.4s; }
         .hero-container { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 30px; }
         .title-wrapper { display: flex; align-items: center; gap: 15px; }
         .accent-line { width: 6px; height: 45px; background: var(--accent); border-radius: 10px; }
         #hero-title { font-size: 3rem; font-weight: 800; }
-        .about-me { margin-top: 5px; color: var(--text-dim); font-weight: 600; }
 
         .controls-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .control-group { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; }
@@ -67,7 +55,7 @@
         .search-input { background: none; border: none; outline: none; color: var(--text-main); font-weight: 600; min-width: 180px; }
 
         .content-container { display: grid; gap: 15px; transition: 0.3s; }
-        .mode-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        .mode-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
         .mode-list { grid-template-columns: 1fr; }
 
         .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; transition: 0.3s; cursor: pointer; display: flex; overflow: hidden; }
@@ -78,28 +66,32 @@
 
         .mode-grid .card { flex-direction: column; padding: 30px 20px; text-align: center; align-items: center; }
         .mode-grid .icon-box { font-size: 3rem; margin-bottom: 15px; }
-        .mode-grid .btn-group { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 10px; margin-top: 20px; }
+        .mode-grid .btn-group { display: grid; grid-template-columns: 1fr; width: 100%; gap: 10px; margin-top: 20px; }
 
-        .action-btn { border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border-radius: 12px; text-decoration: none; }
-        .mode-list .action-btn { padding: 10px 15px; font-size: 0.75rem; }
-        .mode-grid .action-btn { padding: 14px; font-size: 0.8rem; }
+        /* --- BUTTONS --- */
+        .action-btn { border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border-radius: 12px; text-decoration: none; padding: 12px 18px; font-size: 0.75rem; height: 42px; }
         .dl-btn { background: #64748b !important; }
+        .zip-btn { background: #6366f1 !important; }
+        
+        .mode-list .zip-btn { width: auto; min-width: 160px; }
+        .mode-grid .zip-btn { width: 100%; }
 
-        /* --- MODALS & SCREENS --- */
+        /* --- MODALS & VIEWERS --- */
         #file-view-screen { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; padding: 40px; overflow-y: auto; }
         #file-view-screen.active { display: block; }
         #media-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
-        #media-modal img, #media-modal video { max-width: 90%; max-height: 80vh; border-radius: 15px; }
+        #media-modal img, #media-modal video { max-width: 95%; max-height: 90vh; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         #pdf-screen { position: fixed; inset: 0; background: var(--bg); z-index: 6000; display: none; flex-direction: column; }
-        .close-media { position: absolute; top: 30px; right: 30px; font-size: 2.5rem; color: white; cursor: pointer; }
+        .close-media { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: white; cursor: pointer; z-index: 5001; }
 
         @media (max-width: 768px) {
             main { padding: 20px; margin-left: var(--sidebar-width); }
             #hero-title { font-size: 1.8rem; }
-            .accent-line { height: 30px; }
             .mode-list .card { flex-direction: column; align-items: flex-start; padding: 15px; }
             .mode-list .btn-group { width: 100%; margin-top: 15px; }
+            .mode-grid { grid-template-columns: 1fr; }
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body onclick="closeSidebarOnEmpty(event)">
@@ -110,16 +102,16 @@
     <nav id="sidebar" onclick="event.stopPropagation()">
         <button class="hamburger-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
         <div class="nav-links">
-            <li class="active" onclick="filterBy('all', this)"><i class="fas fa-th-large"></i> <span>All Library</span></li>
+            <li class="active" onclick="filterBy('all', this, event)"><i class="fas fa-th-large"></i> <span>All Library</span></li>
             <div class="nav-section-label">School Level</div>
-            <li onclick="filterBy('class10', this)"><i class="fas fa-graduation-cap"></i> <span>Class 10</span></li>
-            <li onclick="filterBy('class11', this)"><i class="fas fa-book-open"></i> <span>Class 11</span></li>
-            <li onclick="filterBy('class12', this)"><i class="fas fa-university"></i> <span>Class 12</span></li>
+            <li onclick="filterBy('class10', this, event)"><i class="fas fa-graduation-cap"></i> <span>Class 10</span></li>
+            <li onclick="filterBy('class11', this, event)"><i class="fas fa-book-open"></i> <span>Class 11</span></li>
+            <li onclick="filterBy('class12', this, event)"><i class="fas fa-university"></i> <span>Class 12</span></li>
             <div class="nav-section-label">Competitive</div>
-            <li onclick="filterBy('jee11', this)"><i class="fas fa-atom"></i> <span>JEE 11th</span></li>
-            <li onclick="filterBy('jee12', this)"><i class="fas fa-rocket"></i> <span>JEE 12th</span></li>
+            <li onclick="filterBy('jee11', this, event)"><i class="fas fa-atom"></i> <span>JEE 11th</span></li>
+            <li onclick="filterBy('jee12', this, event)"><i class="fas fa-rocket"></i> <span>JEE 12th</span></li>
             <div class="nav-section-label">Extras</div>
-            <li onclick="filterBy('extra', this)"><i class="fas fa-plus-circle"></i> <span>Extra Resources</span></li>
+            <li onclick="filterBy('extra', this, event)"><i class="fas fa-plus-circle"></i> <span>Extra Resources</span></li>
         </div>
     </nav>
 
@@ -146,10 +138,7 @@
                 <i class="fas fa-list view-btn active" onclick="toggleViewMode('list', this)"></i>
                 <i class="fas fa-th-large view-btn" onclick="toggleViewMode('grid', this)"></i>
             </div>
-            <div class="control-group">
-                <i class="fas fa-search" style="color:var(--text-dim)"></i>
-                <input type="text" class="search-input" placeholder="Search files..." oninput="handleGlobalSearch(this.value)">
-            </div>
+            <div class="control-group"><i class="fas fa-search" style="color:var(--text-dim)"></i><input type="text" class="search-input" placeholder="Search files..." oninput="handleGlobalSearch(this.value)"></div>
         </div>
         <div id="folder-content-display" class="content-container mode-list"></div>
     </div>
@@ -185,19 +174,11 @@
         }
 
         function toggleNav() { document.getElementById('sidebar').classList.toggle('open'); }
-
-        // Smart Sidebar Close
-        function closeSidebarOnEmpty(e) {
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            }
-        }
+        function closeSidebarOnEmpty(e) { if (document.getElementById('sidebar').classList.contains('open')) document.getElementById('sidebar').classList.remove('open'); }
 
         function toggleViewMode(mode, el) {
             viewMode = mode;
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-            // This fix ensures both main and folder toggles stay in sync
             document.querySelectorAll(`.fa-${mode === 'list' ? 'list' : 'th-large'}`).forEach(b => b.classList.add('active'));
             document.querySelectorAll('.content-container').forEach(c => c.className = `content-container mode-${mode}`);
             if (currentReleaseData) renderFiles(currentReleaseData);
@@ -215,7 +196,6 @@
             const grid = document.getElementById('main-grid');
             grid.innerHTML = '';
             let filtered = filter === 'all' ? releasesStore.filter(r => !r.tag_name.toLowerCase().includes('extra')) : releasesStore.filter(r => r.tag_name.toLowerCase().includes(filter));
-
             filtered.forEach(rel => {
                 const color = colors[Math.floor(Math.random()*colors.length)];
                 const card = document.createElement('div');
@@ -243,38 +223,54 @@
             display.innerHTML = '';
             release.assets.forEach(asset => {
                 const name = asset.name.toLowerCase();
-                let type = 'file', icon = 'fa-file', badge = 'File', color = '#64748b', canView = true;
+                let type = 'file', icon = 'fa-file', badge = 'File', color = '#64748b', isZip = false;
                 if (name.match(/\.(mp4|mkv|webm)$/)) { type = 'video'; icon = 'fa-video'; badge = 'Video'; color = '#3b82f6'; }
                 else if (name.endsWith('.pdf')) { type = 'pdf'; icon = 'fa-file-pdf'; badge = 'PDF'; color = '#10b981'; }
                 else if (name.match(/\.(jpg|jpeg|png|webp|gif)$/)) { type = 'image'; icon = 'fa-image'; badge = 'Image'; color = '#f97316'; }
-                else if (name.match(/\.(zip|rar|7z)$/)) { type = 'zip'; icon = 'fa-file-archive'; badge = 'Archive'; color = '#a855F7'; canView = false; }
+                else if (name.match(/\.(zip|rar|7z)$/)) { isZip = true; icon = 'fa-file-archive'; badge = 'Archive'; color = '#a855F7'; }
 
                 const item = document.createElement('div');
                 item.className = 'card';
-                item.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas ${icon}"></i></div><div class="card-text-content"><span class="file-type-badge" style="color:${color}">${badge}</span><h3 style="font-size:0.9rem; font-weight:700; word-break: break-all;">${asset.name}</h3></div><div class="btn-group">${canView ? `<button class="action-btn" style="background:${color}" onclick="event.stopPropagation(); handleFile('${asset.browser_download_url}', '${type}', '${asset.name}')"><i class="fas fa-eye"></i> VIEW</button>` : ''}<a href="${asset.browser_download_url}" download class="action-btn dl-btn" onclick="event.stopPropagation();"><i class="fas fa-download"></i></a></div>`;
+                item.innerHTML = `
+                    <div class="icon-box" style="color:${color}"><i class="fas ${icon}"></i></div>
+                    <div class="card-text-content">
+                        <span class="file-type-badge" style="color:${color}; font-size: 0.6rem; font-weight: 800;">${badge}</span>
+                        <h3 style="font-size:0.9rem; font-weight:700;">${asset.name}</h3>
+                    </div>
+                    <div class="btn-group">
+                        ${isZip ? 
+                            `<a href="${asset.browser_download_url}" download class="action-btn zip-btn"><i class="fas fa-download"></i> DOWNLOAD ZIP</a>` : 
+                            `<button class="action-btn" style="background:${color}" onclick="event.stopPropagation(); handleFile('${asset.browser_download_url}', '${type}', '${asset.name}')"><i class="fas fa-eye"></i> VIEW</button>
+                             <a href="${asset.browser_download_url}" download class="action-btn dl-btn" onclick="event.stopPropagation();"><i class="fas fa-download"></i> DOWNLOAD</a>`
+                        }
+                    </div>`;
                 display.appendChild(item);
             });
         }
 
+        // --- FULLSCREEN VIDEO & VIEW LOGIC ---
         function handleFile(url, type, name) {
             const content = document.getElementById('media-content');
-            if (type === 'video') { content.innerHTML = `<video src="${url}" controls autoplay style="width:100%"></video>`; document.getElementById('media-modal').style.display = 'flex'; }
-            else if (type === 'image') { content.innerHTML = `<img src="${url}" alt="${name}" style="width:100%">`; document.getElementById('media-modal').style.display = 'flex'; }
-            else if (type === 'pdf') { document.getElementById('pdf-title').innerText = name; document.getElementById('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`; document.getElementById('pdf-screen').style.display = 'flex'; }
+            if (type === 'video') { 
+                content.innerHTML = `<video src="${url}" controls autoplay playsinline style="width:100%; border-radius:12px;"></video>`; 
+                document.getElementById('media-modal').style.display = 'flex'; 
+            }
+            else if (type === 'image') { 
+                content.innerHTML = `<img src="${url}" alt="${name}" style="width:100%">`; 
+                document.getElementById('media-modal').style.display = 'flex'; 
+            }
+            else if (type === 'pdf') { 
+                document.getElementById('pdf-title').innerText = name; 
+                document.getElementById('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`; 
+                document.getElementById('pdf-screen').style.display = 'flex'; 
+            }
         }
 
         function closeMedia() { document.getElementById('media-modal').style.display = 'none'; document.getElementById('media-content').innerHTML = ''; }
         function closePdf() { document.getElementById('pdf-screen').style.display = 'none'; document.getElementById('pdf-frame').src = ''; }
         function closeFolder() { document.getElementById('file-view-screen').classList.remove('active'); currentReleaseData = null; }
-        function filterBy(tag, el) { 
-            document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active')); 
-            el.classList.add('active'); 
-            renderFolders(tag); 
-            if(window.innerWidth < 768) toggleNav(); 
-        }
-        function handleGlobalSearch(q) { 
-            document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'); 
-        }
+        function filterBy(tag, el, event) { event.stopPropagation(); document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active')); el.classList.add('active'); renderFolders(tag); }
+        function handleGlobalSearch(q) { document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'); }
     </script>
 </body>
 </html>
