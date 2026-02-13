@@ -27,77 +27,269 @@
         .btn { display: block; text-align: center; background: #334155; color: white; padding: 10px; border-radius: 6px; text-decoration: none; margin-top: 15px; transition: 0.3s; }
         .btn:hover { background: var(--primary); }
         
-        #loader { text-align: center; font-size: 1.2rem; margin-top: 50px; color: #94a3b8; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyVault Pro | Pratyush</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --bg: #f8fafc; --sidebar-bg: #ffffff; --accent: #3b82f6; 
+            --card-bg: #ffffff; --text-main: #0f172a; --text-dim: #64748b; 
+            --border: rgba(0,0,0,0.08); --sidebar-width: 80px; --sidebar-expanded: 260px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #050b18; --sidebar-bg: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); 
+                --text-main: #ffffff; --text-dim: #94a3b8; --border: rgba(255,255,255,0.1);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); display: flex; transition: 0.3s; min-height: 100vh; overflow-x: hidden; }
+
+        /* --- LOADERS --- */
+        #page-entrance-loader { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        #folder-loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .spinner { width: 45px; height: 45px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+        /* --- SIDEBAR --- */
+        nav { position: fixed; left: 0; top: 0; width: var(--sidebar-width); height: 100vh; background: var(--sidebar-bg); border-right: 1px solid var(--border); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; }
+        nav.open { width: var(--sidebar-expanded); }
+        .hamburger-btn { min-width: 45px; height: 45px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: none; }
+        nav.open .hamburger-btn { margin: 20px; }
+        .nav-section-label { font-size: 0.65rem; font-weight: 800; color: var(--accent); padding: 20px 25px 5px; text-transform: uppercase; letter-spacing: 1px; display: none; white-space: nowrap; }
+        nav.open .nav-section-label { display: block; }
+        .nav-links { flex-grow: 1; padding: 10px; list-style: none; overflow-y: auto; }
+        .nav-links li { padding: 12px 25px; border-radius: 12px; cursor: pointer; margin-bottom: 4px; display: flex; align-items: center; gap: 25px; color: var(--text-dim); transition: 0.2s; }
+        .nav-links li span { opacity: 0; transition: 0.2s; white-space: nowrap; font-weight: 600; }
+        nav.open .nav-links li span { opacity: 1; }
+        .nav-links li:hover, .nav-links li.active { background: var(--accent); color: white; }
+
+        /* --- HERO & CONTROLS --- */
+        main { flex: 1; margin-left: var(--sidebar-width); padding: 40px; transition: 0.4s; }
+        .hero-container { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 30px; }
+        .title-wrapper { display: flex; align-items: center; gap: 15px; }
+        .accent-line { width: 6px; height: 45px; background: var(--accent); border-radius: 10px; }
+        #hero-title { font-size: 3rem; font-weight: 800; }
+        .about-me { margin-top: 5px; color: var(--text-dim); font-weight: 600; }
+
+        .controls-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .control-group { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 15px; border-radius: 15px; display: flex; align-items: center; gap: 12px; }
+        .view-btn { cursor: pointer; color: var(--text-dim); transition: 0.2s; font-size: 1.1rem; }
+        .view-btn.active { color: var(--accent); }
+        .search-input { background: none; border: none; outline: none; color: var(--text-main); font-weight: 600; min-width: 180px; }
+
+        /* --- GRID & LIST DISPLAY --- */
+        .content-container { display: grid; gap: 20px; transition: 0.3s; }
+        .mode-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        .mode-list { grid-template-columns: 1fr; }
+
+        /* Cards */
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Grid Styles */
+        .mode-grid .card { padding: 40px 20px; text-align: center; align-items: center; }
+        .mode-grid .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .mode-grid .icon-box { font-size: 3.5rem; margin-bottom: 15px; }
+        .mode-grid .action-btn { width: 100%; margin-top: 20px; padding: 14px; border-radius: 15px; font-weight: 800; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        /* List Styles */
+        .mode-list .card { flex-direction: row; align-items: center; padding: 15px 25px; border-radius: 18px; }
+        .mode-list .icon-box { font-size: 1.5rem; margin-right: 20px; }
+        .mode-list .card-text-content { flex: 1; text-align: left; }
+        .mode-list .action-btn { width: 100px; height: 45px; margin-top: 0; border-radius: 12px; font-weight: 800; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8rem; }
+
+        /* Labels */
+        .file-type-badge { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+
+        /* Screens */
+        #file-view-screen { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; padding: 40px; overflow-y: auto; }
+        #file-view-screen.active { display: block; }
+        #pdf-screen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: none; flex-direction: column; }
+        #video-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 4000; }
+        video { width: 90%; max-width: 1000px; border-radius: 20px; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>📚 My Study Material</h1>
-        <p>Managed by pratyushqwerty7</p>
-    </header>
+    <div id="page-entrance-loader"><div class="spinner"></div></div>
+    <div id="folder-loader"><div class="spinner"></div></div>
 
-    <input type="text" id="searchBar" placeholder="Search for a topic, subject, or file name..." onkeyup="filterFiles()">
+    <nav id="sidebar">
+        <button class="hamburger-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+        <div class="nav-links">
+            <li class="active" onclick="filterBy('all', this)"><i class="fas fa-th-large"></i> <span>All Library</span></li>
+            <div class="nav-section-label">School Level</div>
+            <li onclick="filterBy('class10', this)"><i class="fas fa-graduation-cap"></i> <span>Class 10</span></li>
+            <li onclick="filterBy('class11', this)"><i class="fas fa-book-open"></i> <span>Class 11</span></li>
+            <li onclick="filterBy('class12', this)"><i class="fas fa-university"></i> <span>Class 12</span></li>
+            <div class="nav-section-label">Competitive</div>
+            <li onclick="filterBy('jee11', this)"><i class="fas fa-atom"></i> <span>JEE 11th</span></li>
+            <li onclick="filterBy('jee12', this)"><i class="fas fa-rocket"></i> <span>JEE 12th</span></li>
+            <div class="nav-section-label">Extras</div>
+            <li onclick="filterBy('extra', this)"><i class="fas fa-plus-circle"></i> <span>Extra Resources</span></li>
+        </div>
+    </nav>
 
-    <div id="loader">Scanning GitHub Releases...</div>
-    <div class="grid" id="materials-list"></div>
-</div>
+    <main>
+        <div class="hero-container">
+            <div class="title-wrapper"><div class="accent-line"></div><h1 id="hero-title">My Library</h1></div>
+            <div class="about-me">Pratyush • Class 10 • Age 16</div>
+        </div>
 
-<script>
-    const GITHUB_USER = 'pratyushqwerty7'; 
-    const REPO_NAME = 'myStudyMaterial';
+        <div class="controls-bar">
+            <div class="control-group">
+                <i class="fas fa-th-large view-btn active" onclick="toggleViewMode('grid', this)"></i>
+                <i class="fas fa-list view-btn" onclick="toggleViewMode('list', this)"></i>
+            </div>
+            <div class="control-group">
+                <i class="fas fa-search" style="color:var(--text-dim)"></i>
+                <input type="text" class="search-input" placeholder="Search..." oninput="handleGlobalSearch(this.value)">
+            </div>
+        </div>
 
-    async function fetchMaterials() {
-        const list = document.getElementById('materials-list');
-        const loader = document.getElementById('loader');
+        <div id="main-grid" class="content-container mode-grid"></div>
+    </main>
+
+    <div id="file-view-screen">
+        <div onclick="closeFolder()" style="cursor:pointer; color:var(--accent); font-weight:800; margin-bottom:20px;"><i class="fas fa-arrow-left"></i> BACK</div>
+        <h1 id="current-folder-title" style="margin-bottom:30px; text-align:center;"></h1>
         
-        try {
-            const response = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/releases`);
-            const releases = await response.json();
-            loader.style.display = 'none';
+        <div class="controls-bar">
+            <div class="control-group">
+                <i class="fas fa-th-large view-btn active" id="f-grid" onclick="toggleViewMode('grid', this)"></i>
+                <i class="fas fa-list view-btn" id="f-list" onclick="toggleViewMode('list', this)"></i>
+            </div>
+            <div class="control-group">
+                <i class="fas fa-search" style="color:var(--text-dim)"></i>
+                <input type="text" class="search-input" placeholder="Search files..." oninput="handleGlobalSearch(this.value)">
+            </div>
+        </div>
 
-            releases.forEach(release => {
-                release.assets.forEach(asset => {
-                    const isVideo = asset.name.toLowerCase().match(/\.(mp4|mkv|webm)$/);
-                    
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.setAttribute('data-name', asset.name.toLowerCase() + " " + release.name.toLowerCase());
-                    
-                    card.innerHTML = `
-                        <span class="release-tag">${release.name}</span>
-                        <div class="file-name">${asset.name}</div>
-                        ${isVideo ? `
-                            <video controls preload="none">
-                                <source src="${asset.browser_download_url}" type="video/mp4">
-                            </video>
-                        ` : ''}
-                        <a href="${asset.browser_download_url}" class="btn" target="_blank">
-                            ${isVideo ? 'Download / Fullscreen' : 'Open Document'}
-                        </a>
-                    `;
-                    list.appendChild(card);
-                });
+        <div id="folder-content-display" class="content-container mode-grid"></div>
+    </div>
+
+    <div id="video-modal"><span onclick="closeVideo()" style="position:absolute; top:30px; right:30px; font-size:3rem; color:white; cursor:pointer;">&times;</span><video id="main-player" controls></video></div>
+    <div id="pdf-screen"><div style="padding:15px; background:var(--sidebar-bg); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;"><button onclick="closePdf()" style="font-weight:800; border:none; background:none; color:var(--text-main); cursor:pointer;">CLOSE</button><span id="pdf-title"></span></div><iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe></div>
+
+    <script>
+        const USER = 'pratyushqwerty7';
+        const REPO = 'myStudyMaterial';
+        let releasesStore = [];
+        let viewMode = 'grid';
+        let currentFilter = 'all';
+        const colors = ['#FF4D4D', '#3B82F6', '#10B981', '#FACC15', '#F97316', '#A855F7'];
+
+        window.addEventListener('load', () => { setTimeout(() => { document.getElementById('page-entrance-loader').style.display = 'none'; }, 500); });
+        function toggleNav() { document.getElementById('sidebar').classList.toggle('open'); }
+
+        function toggleViewMode(mode, el) {
+            viewMode = mode;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            
+            const containers = document.querySelectorAll('.content-container');
+            containers.forEach(c => {
+                c.className = `content-container mode-${mode}`;
             });
-        } catch (error) {
-            loader.innerHTML = "Error fetching data. Make sure the repo is public and has releases.";
+            renderFolders(currentFilter);
+            // Re-render folder if open
+            if(document.getElementById('file-view-screen').classList.contains('active')) {
+                const openRel = releasesStore.find(r => r.name === document.getElementById('current-folder-title').innerText);
+                if(openRel) renderFiles(openRel);
+            }
         }
-    }
 
-    function filterFiles() {
-        const query = document.getElementById('searchBar').value.toLowerCase();
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            const text = card.getAttribute('data-name');
-            card.style.display = text.includes(query) ? 'block' : 'none';
-        });
-    }
+        async function fetchLibrary() {
+            const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases`);
+            releasesStore = await res.json();
+            renderFolders('all');
+        }
 
-    fetchMaterials();
-</script>
+        function handleGlobalSearch(query) {
+            const q = query.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none');
+        }
 
+        function renderFolders(filter) {
+            currentFilter = filter;
+            const grid = document.getElementById('main-grid');
+            grid.innerHTML = '';
+            let filtered = filter === 'all' ? releasesStore.filter(r => !r.tag_name.toLowerCase().includes('extra')) : releasesStore.filter(r => r.tag_name.toLowerCase().includes(filter));
+
+            filtered.forEach(rel => {
+                const color = colors[Math.floor(Math.random()*colors.length)];
+                const card = document.createElement('div');
+                card.className = 'card';
+                if(viewMode === 'grid') card.style.borderTop = `6px solid ${color}`;
+                else card.style.borderLeft = `6px solid ${color}`;
+                
+                card.onclick = () => {
+                    document.getElementById('folder-loader').style.display = 'flex';
+                    setTimeout(() => { document.getElementById('folder-loader').style.display = 'none'; openFolder(rel); }, 500);
+                };
+                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="card-text-content"><h3 style="font-weight:800;">${rel.name}</h3></div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function openFolder(release) {
+            document.getElementById('current-folder-title').innerText = release.name;
+            renderFiles(release);
+            document.getElementById('file-view-screen').classList.add('active');
+        }
+
+        function renderFiles(release) {
+            const display = document.getElementById('folder-content-display');
+            display.innerHTML = '';
+            release.assets.forEach(asset => {
+                if(asset.name.endsWith('.zip')) return;
+                const isVid = asset.name.match(/\.(mp4|mkv|webm)$/i);
+                const item = document.createElement('div');
+                item.className = 'card';
+                item.innerHTML = `
+                    <div class="icon-box" style="color:${isVid?'#3b82f6':'#10b981'}"><i class="fas ${isVid?'fa-video':'fa-file-pdf'}"></i></div>
+                    <div class="card-text-content">
+                        <span class="file-type-badge" style="color:${isVid?'#3b82f6':'#10b981'}">${isVid?'Video Material':'PDF Document'}</span>
+                        <h3 style="font-size:1rem; font-weight:700;">${asset.name}</h3>
+                    </div>
+                    <button class="action-btn" style="background:${isVid?'#3b82f6':'#10b981'}" onclick="handleFile('${asset.browser_download_url}', ${!!isVid}, '${asset.name}')">
+                        <i class="fas ${isVid?'fa-play':'fa-file-pdf'}"></i> OPEN ${isVid?'VID':'PDF'}
+                    </button>`;
+                display.appendChild(item);
+            });
+        }
+
+        async function handleFile(url, isVid, name) {
+            if(isVid) {
+                document.getElementById('video-modal').style.display = 'flex';
+                document.getElementById('main-player').src = url;
+                document.getElementById('main-player').play();
+            } else {
+                document.getElementById('pdf-title').innerText = name;
+                document.getElementById('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+                document.getElementById('pdf-screen').style.display = 'flex';
+            }
+        }
+
+        function closeVideo() { document.getElementById('main-player').pause(); document.getElementById('video-modal').style.display = 'none'; }
+        function closePdf() { document.getElementById('pdf-screen').style.display = 'none'; }
+        function closeFolder() { document.getElementById('file-view-screen').classList.remove('active'); }
+        function filterBy(tag, el) {
+            document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+            renderFolders(tag);
+        }
+
+        fetchLibrary();
+    </script>
 </body>
 </html>
-
-
