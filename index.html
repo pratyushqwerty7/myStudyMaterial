@@ -20,93 +20,87 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow: hidden; }
+        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
         /* --- LOADING ANIMATION --- */
         #loader { 
-            position: fixed; inset: 0; background: rgba(248,250,252,0.8); backdrop-filter: blur(10px);
+            position: fixed; inset: 0; background: rgba(248,250,252,0.9); backdrop-filter: blur(10px);
             z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        @media (prefers-color-scheme: dark) { #loader { background: rgba(2,6,23,0.8); } }
         .spinner { width: 50px; height: 50px; border: 5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s infinite linear; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- SIDEBAR & OVERLAY --- */
-        #overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4); 
-            backdrop-filter: blur(4px); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; 
-        }
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
         #overlay.active { opacity: 1; pointer-events: auto; }
 
-        nav { 
-            position: fixed; left: 0; top: 0; width: var(--side-w); height: 100vh; 
-            background: var(--side); border-right: 1px solid var(--border); 
-            transition: var(--transition); z-index: 2000; display: flex; flex-direction: column; 
-        }
+        nav { position: fixed; left: 0; top: 0; width: var(--side-w); height: 100vh; background: var(--side); border-right: 1px solid var(--border); transition: var(--transition); z-index: 2000; display: flex; flex-direction: column; }
         nav.expanded { width: var(--side-open); box-shadow: 20px 0 60px rgba(0,0,0,0.1); }
         
-        .nav-btn { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: white; border: none; cursor: pointer; transition: 0.3s; }
-        .nav-btn:hover { transform: rotate(90deg); }
-
+        .nav-btn { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: white; border: none; cursor: pointer; transition: 0.3s; flex-shrink: 0; }
+        
         .nav-list { flex: 1; padding: 10px; list-style: none; overflow-y: auto; scrollbar-width: none; }
         .nav-item { height: 50px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; padding: 0 15px; color: var(--dim); transition: 0.3s; white-space: nowrap; }
         
-        /* Fixed icon visibility when active */
+        /* FIX: Make icon white when background is blue (active) */
         .nav-item.active { background: var(--accent); color: white !important; }
         .nav-item.active i { color: white !important; } 
 
-        .nav-item i { min-width: 45px; text-align: center; font-size: 1.2rem; margin-left: -10px; }
+        .nav-item i { min-width: 45px; text-align: center; font-size: 1.2rem; margin-left: -10px; transition: 0.3s; }
         .nav-item span { opacity: 0; font-weight: 700; margin-left: 15px; transition: 0.2s; }
         nav.expanded .nav-item span { opacity: 1; }
-        
         .nav-label { font-size: 0.65rem; font-weight: 900; color: var(--accent); padding: 20px 0 10px 15px; text-transform: uppercase; display: none; }
         nav.expanded .nav-label { display: block; }
 
         /* --- MAIN CONTENT --- */
-        main { flex: 1; margin-left: var(--side-w); padding: 40px 6%; width: calc(100% - var(--side-w)); overflow-y: auto; height: 100vh; transition: 0.3s; }
+        main { flex: 1; margin-left: var(--side-w); padding: 40px 6%; width: calc(100% - var(--side-w)); overflow-y: auto; height: 100vh; }
         .header { text-align: center; margin-bottom: 40px; }
         h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1.5px; }
 
-        .toolbar { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .toolbar { display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
         .tool-panel { background: var(--side); border: 1px solid var(--border); padding: 10px 20px; border-radius: 18px; display: flex; align-items: center; gap: 15px; box-shadow: var(--shadow); }
-        .toggle-icon { cursor: pointer; color: var(--dim); font-size: 1.1rem; transition: 0.3s; padding: 5px; }
+        .toggle-icon { cursor: pointer; color: var(--dim); font-size: 1.1rem; transition: 0.3s; }
         .toggle-icon.active { color: var(--accent); transform: scale(1.1); }
-        .search-bar { background: none; border: none; outline: none; color: var(--text); font-weight: 600; min-width: 200px; }
+        .search-bar { background: none; border: none; outline: none; color: var(--text); font-weight: 600; width: 180px; }
+        .sort-select { background: none; border: none; color: var(--dim); font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer; }
 
         /* --- CARDS --- */
-        .stage { display: grid; gap: 20px; }
-        .stage-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        .stage { display: grid; gap: 20px; width: 100%; }
+        .stage-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
         .stage-list { grid-template-columns: 1fr; }
 
-        .card { background: var(--side); border: 1px solid var(--border); border-radius: 24px; padding: 25px; display: flex; align-items: center; cursor: pointer; transition: 0.3s; position: relative; }
-        .card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
+        .card { background: var(--side); border: 1px solid var(--border); border-radius: 24px; padding: 20px; display: flex; align-items: center; cursor: pointer; transition: 0.3s; overflow: hidden; position: relative; }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
         
-        .stage-grid .card { flex-direction: column; text-align: center; padding: 40px 25px; }
-        .stage-grid .icon-box { font-size: 5rem; margin-bottom: 25px; }
-        .stage-grid .info { padding: 0; margin-bottom: 25px; width: 100%; }
-        .stage-list .icon-box { font-size: 2.5rem; }
-        .stage-list .info { flex: 1; padding: 0 25px; }
-        .info h3 { font-size: 1.1rem; font-weight: 800; }
+        .info { overflow: hidden; min-width: 0; flex: 1; } 
+        .info h3 { font-size: 1.1rem; font-weight: 800; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.3; }
+        .info small { color: var(--dim); font-weight: 600; display: block; margin-top: 4px; }
 
-        .actions { display: flex; gap: 12px; }
-        .btn { height: 46px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; text-decoration: none; color: white; font-size: 0.85rem; }
-        .btn-v { background: var(--accent); padding: 0 20px; }
-        .btn-d { background: #475569; width: 46px; }
+        .stage-grid .card { flex-direction: column; text-align: center; padding: 35px 20px; }
+        .stage-grid .icon-box { font-size: 4.5rem; margin-bottom: 20px; }
+        .stage-list .icon-box { font-size: 2.5rem; flex-shrink: 0; width: 60px; text-align: center; }
+        .stage-list .info { padding: 0 20px; }
+
+        .actions { display: flex; gap: 10px; flex-shrink: 0; }
+        .btn { height: 42px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; text-decoration: none; color: white; font-size: 0.8rem; }
+        .btn-v { background: var(--accent); padding: 0 18px; }
+        .btn-d { background: #475569; width: 42px; }
         .btn-z { background: #6366f1; width: 100%; padding: 0 20px; }
         
-        /* --- MOBILE FIX --- */
+        /* Mobile Fixes */
         @media (max-width: 800px) {
             main { padding: 25px 15px; }
             .stage-list .card { flex-direction: column; text-align: center; }
-            .stage-list .actions { width: 100%; flex-direction: row; justify-content: center; }
+            .stage-list .info { padding: 15px 0; width: 100%; }
+            .stage-list .actions { width: 100%; justify-content: center; }
             .stage-list .btn-v { flex: 1; }
-            .stage-list .btn-z { width: 100%; }
+            h1 { font-size: 2.2rem; }
         }
 
         #folder-view { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; padding: 40px 6%; overflow-y: auto; }
         #viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; }
         .viewer-box { width: 95%; height: 90vh; background: #000; border-radius: 24px; position: relative; overflow: hidden; }
-        .close-view { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; z-index: 5001; }
+        .close-view { position: absolute; top: 15px; right: 25px; color: white; font-size: 3rem; cursor: pointer; z-index: 5001; }
     </style>
 </head>
 <body>
@@ -134,8 +128,14 @@
         <div class="header"><h1>My Vault</h1><p style="color:var(--dim); font-weight:700;">Pratyush • Digital Library</p></div>
         <div class="toolbar">
             <div class="tool-panel">
-                <i class="fas fa-list toggle-icon" id="mode-list-main" onclick="updateMode('list', event)"></i>
-                <i class="fas fa-th-large toggle-icon" id="mode-grid-main" onclick="updateMode('grid', event)"></i>
+                <i class="fas fa-list toggle-icon" id="mode-list-main" onclick="updateMode('list')"></i>
+                <i class="fas fa-th-large toggle-icon" id="mode-grid-main" onclick="updateMode('grid')"></i>
+            </div>
+            <div class="tool-panel">
+                <select class="sort-select" id="main-sort" onchange="renderMain()">
+                    <option value="new">Newest First</option>
+                    <option value="az">Name A-Z</option>
+                </select>
             </div>
             <div class="tool-panel"><i class="fas fa-search" style="color:var(--dim)"></i><input type="text" class="search-bar" id="main-search" placeholder="Search resources..." oninput="doSearch('main-stage', 'main-search')"></div>
         </div>
@@ -143,12 +143,18 @@
     </main>
 
     <div id="folder-view">
-        <button onclick="closeFolder()" style="background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer; margin-bottom:25px;"><i class="fas fa-arrow-left"></i> BACK</button>
-        <h2 id="folder-title" style="font-size: 2.2rem; font-weight: 900; margin-bottom: 30px;"></h2>
+        <button onclick="closeFolder()" style="background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer; margin-bottom:25px; display:flex; align-items:center; gap:8px;"><i class="fas fa-arrow-left"></i> BACK TO LIBRARY</button>
+        <h2 id="folder-title" style="font-size: 2.2rem; font-weight: 900; margin-bottom: 25px;"></h2>
         <div class="toolbar" style="justify-content: flex-start;">
             <div class="tool-panel">
-                <i class="fas fa-list toggle-icon" id="mode-list-folder" onclick="updateMode('list', event)"></i>
-                <i class="fas fa-th-large toggle-icon" id="mode-grid-folder" onclick="updateMode('grid', event)"></i>
+                <i class="fas fa-list toggle-icon" id="mode-list-folder" onclick="updateMode('list')"></i>
+                <i class="fas fa-th-large toggle-icon" id="mode-grid-folder" onclick="updateMode('grid')"></i>
+            </div>
+            <div class="tool-panel">
+                <select class="sort-select" id="folder-sort" onchange="renderFolder()">
+                    <option value="az">Name A-Z</option>
+                    <option value="size">Largest Size</option>
+                </select>
             </div>
             <div class="tool-panel"><i class="fas fa-search" style="color:var(--dim)"></i><input type="text" class="search-bar" id="folder-search" placeholder="Search in folder..." oninput="doSearch('folder-stage', 'folder-search')"></div>
         </div>
@@ -159,102 +165,141 @@
 
     <script>
         const API = { user: 'pratyushqwerty7', repo: 'myStudyMaterial' };
-        let dataStore = [], currentMode = 'list', filterTag = 'all';
-        const palette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+        let dataStore = [], currentMode = 'list', filterTag = 'all', activeRel = null;
+        const palette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
 
         function showLoad() { document.getElementById('loader').style.display = 'flex'; }
         function hideLoad() { setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 600); }
 
         async function init() {
             showLoad();
-            const resp = await fetch(`https://api.github.com/repos/${API.user}/${API.repo}/releases`);
-            dataStore = await resp.json();
-            updateMode('list');
+            try {
+                const resp = await fetch(`https://api.github.com/repos/${API.user}/${API.repo}/releases`);
+                dataStore = await resp.json();
+                renderMain();
+            } catch(e) { console.error("API Error"); }
             hideLoad();
         }
 
         function renderMain() {
             const stage = document.getElementById('main-stage');
+            const sortVal = document.getElementById('main-sort').value;
             stage.className = `stage stage-${currentMode}`;
             stage.innerHTML = '';
-            const filtered = filterTag === 'extra' ? dataStore.filter(r => r.tag_name.toLowerCase().includes('extra')) : (filterTag === 'all' ? dataStore.filter(r => !r.tag_name.toLowerCase().includes('extra')) : dataStore.filter(r => r.tag_name.toLowerCase().includes(filterTag)));
-            filtered.forEach((rel) => {
+
+            let filtered = dataStore.filter(r => {
+                const tag = r.tag_name.toLowerCase();
+                if(filterTag === 'all') return !tag.includes('extra');
+                if(filterTag === 'extra') return tag.includes('extra');
+                return tag.includes(filterTag);
+            });
+
+            if(sortVal === 'az') filtered.sort((a,b) => a.name.localeCompare(b.name));
+            else filtered.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+            filtered.forEach(rel => {
                 const color = palette[Math.floor(Math.random() * palette.length)];
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
                 card.onclick = () => openFolder(rel);
-                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="info"><h3>${rel.name}</h3><small style="color:var(--dim)">Vault</small></div>`;
+                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="info"><h3>${rel.name}</h3><small>${rel.assets.length} items in Vault</small></div>`;
                 stage.appendChild(card);
             });
+            syncIcons();
         }
 
         function openFolder(rel) {
-            showLoad();
-            const title = document.getElementById('folder-title'), stage = document.getElementById('folder-stage');
-            title.innerText = rel.name; stage.className = `stage stage-${currentMode}`; stage.innerHTML = '';
-            rel.assets.forEach(asset => {
+            activeRel = rel;
+            document.getElementById('folder-title').innerText = rel.name;
+            document.getElementById('folder-view').style.display = 'block';
+            renderFolder();
+        }
+
+        function renderFolder() {
+            if(!activeRel) return;
+            const stage = document.getElementById('folder-stage');
+            const sortVal = document.getElementById('folder-sort').value;
+            stage.className = `stage stage-${currentMode}`;
+            stage.innerHTML = '';
+
+            let assets = [...activeRel.assets];
+            if(sortVal === 'az') assets.sort((a,b) => a.name.localeCompare(b.name));
+            else assets.sort((a,b) => b.size - a.size);
+
+            assets.forEach(asset => {
                 const meta = getMeta(asset.name), color = palette[Math.floor(Math.random() * palette.length)];
-                const card = document.createElement('div'); card.className = 'card';
+                const card = document.createElement('div');
+                card.className = 'card';
                 card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
-                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas ${meta.i}"></i></div><div class="info"><h3>${asset.name}</h3><small style="color:${color}; font-weight:800">${meta.t}</small></div><div class="actions">${meta.isZip ? `<a href="${asset.browser_download_url}" class="btn btn-z" onclick="event.stopPropagation()"><i class="fas fa-download"></i> ZIP DOWNLOAD</a>` : `<button class="btn btn-v" onclick="viewFile('${asset.browser_download_url}', '${meta.t}', event)">VIEW</button><a href="${asset.browser_download_url}" class="btn btn-d" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>`}</div>`;
+                card.innerHTML = `
+                    <div class="icon-box" style="color:${color}"><i class="fas ${meta.i}"></i></div>
+                    <div class="info"><h3>${asset.name}</h3><small>${meta.t} • ${(asset.size/1048576).toFixed(2)} MB</small></div>
+                    <div class="actions">
+                        ${meta.isZip ? `<a href="${asset.browser_download_url}" class="btn btn-z"><i class="fas fa-download"></i> DOWNLOAD ZIP</a>` : 
+                        `<button class="btn btn-v" onclick="viewFile('${asset.browser_download_url}', '${meta.t}', event)">VIEW</button>
+                        <a href="${asset.browser_download_url}" class="btn btn-d"><i class="fas fa-download"></i></a>`}
+                    </div>`;
                 stage.appendChild(card);
             });
-            document.getElementById('folder-view').style.display = 'block'; syncIcons(); hideLoad();
+            syncIcons();
         }
 
         function getMeta(name) {
             const n = name.toLowerCase();
             if (n.match(/\.(mp4|mkv|webm)$/)) return { t: 'Video', i: 'fa-play-circle' };
             if (n.endsWith('.pdf')) return { t: 'PDF', i: 'fa-file-pdf' };
-            if (n.match(/\.(png|jpg|jpeg|webp)$/)) return { t: 'Image', i: 'fa-image' };
-            if (n.match(/\.(zip|7z|rar)$/)) return { t: 'Archive', i: 'fa-file-archive', isZip: true };
+            if (n.match(/\.(png|jpg|jpeg|webp|gif)$/)) return { t: 'Image', i: 'fa-image' };
+            if (n.match(/\.(mp3|wav|ogg)$/)) return { t: 'Audio', i: 'fa-headphones' };
+            if (n.match(/\.(docx|doc)$/)) return { t: 'Word', i: 'fa-file-word' };
+            if (n.match(/\.(xlsx|xls|csv)$/)) return { t: 'Excel', i: 'fa-file-excel' };
+            if (n.endsWith('.accdb')) return { t: 'Access', i: 'fa-database' };
+            if (n.endsWith('.txt')) return { t: 'Text', i: 'fa-file-alt' };
+            if (n.match(/\.(zip|7z|rar|tar|gz)$/)) return { t: 'Archive', i: 'fa-file-archive', isZip: true };
             return { t: 'File', i: 'fa-file' };
         }
 
         function viewFile(url, type, e) {
-            e.stopPropagation(); const box = document.getElementById('viewer-content'); box.innerHTML = '';
+            e.stopPropagation();
+            const box = document.getElementById('viewer-content'); box.innerHTML = '';
             if (type === 'Video') box.innerHTML = `<video src="${url}" controls autoplay style="width:100%; height:100%"></video>`;
-            else if (type === 'PDF') box.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" style="width:100%; height:100%; border:none;"></iframe>`;
-            else box.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center;"><img src="${url}" style="max-width:95%; max-height:95%; object-fit:contain;"></div>`;
+            else if (['PDF', 'Word', 'Excel'].includes(type)) box.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" style="width:100%; height:100%; border:none;"></iframe>`;
+            else if (type === 'Audio') box.innerHTML = `<div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; gap:20px;"><i class="fas fa-music" style="font-size:5rem"></i><audio src="${url}" controls autoplay style="width:80%"></audio></div>`;
+            else if (type === 'Image') box.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center;"><img src="${url}" style="max-width:95%; max-height:95%; object-fit:contain;"></div>`;
+            else box.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; background:white;"></iframe>`;
             document.getElementById('viewer').style.display = 'flex';
         }
 
-        function toggleSide(force) {
-            const nav = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            const isExpanding = force !== undefined ? force : !nav.classList.contains('expanded');
-            
-            nav.classList.toggle('expanded', isExpanding);
-            overlay.classList.toggle('active', isExpanding);
+        function toggleSide(f) {
+            const s = document.getElementById('sidebar'), o = document.getElementById('overlay');
+            const exp = f !== undefined ? f : !s.classList.contains('expanded');
+            s.classList.toggle('expanded', exp); o.classList.toggle('active', exp);
         }
 
-        function setFilter(tag, el) { 
-            filterTag = tag; 
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); 
+        function setFilter(tag, el) {
+            filterTag = tag;
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active'); 
-            renderMain(); 
+            renderMain();
             if(window.innerWidth < 1000) toggleSide(false);
         }
 
-        function updateMode(m, e) {
-            if(e) e.stopPropagation(); currentMode = m; renderMain();
-            const folderTitle = document.getElementById('folder-title').innerText;
-            if (folderTitle) { const currentRel = dataStore.find(r => r.name === folderTitle); if(currentRel) openFolder(currentRel); }
-            syncIcons();
+        function updateMode(m) {
+            currentMode = m;
+            activeRel ? renderFolder() : renderMain();
         }
 
         function syncIcons() {
             const isGrid = currentMode === 'grid';
-            ['mode-list-main', 'mode-list-folder'].forEach(id => document.getElementById(id).classList.toggle('active', !isGrid));
-            ['mode-grid-main', 'mode-grid-folder'].forEach(id => document.getElementById(id).classList.toggle('active', isGrid));
+            ['mode-list-main', 'mode-list-folder'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).classList.toggle('active', !isGrid); });
+            ['mode-grid-main', 'mode-grid-folder'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).classList.toggle('active', isGrid); });
         }
 
-        function doSearch(stageId, inputId) {
-            const q = document.getElementById(inputId).value.toLowerCase();
-            document.getElementById(stageId).querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none');
+        function doSearch(s, i) {
+            const q = document.getElementById(i).value.toLowerCase();
+            document.getElementById(s).querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none');
         }
-        function closeFolder() { document.getElementById('folder-view').style.display = 'none'; document.getElementById('folder-title').innerText = ''; }
+        function closeFolder() { document.getElementById('folder-view').style.display = 'none'; activeRel = null; }
         function closeMedia() { document.getElementById('viewer').style.display = 'none'; document.getElementById('viewer-content').innerHTML = ''; }
 
         init();
