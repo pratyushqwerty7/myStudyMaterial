@@ -12,20 +12,18 @@
             --card-bg: #ffffff; --text-main: #0f172a; --text-dim: #64748b; 
             --border: rgba(0,0,0,0.08); --sidebar-width: 80px; --sidebar-expanded: 260px;
         }
-
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #050b18; --sidebar-bg: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); 
                 --text-main: #ffffff; --text-dim: #94a3b8; --border: rgba(255,255,255,0.1);
             }
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text-main); display: flex; transition: 0.3s; min-height: 100vh; overflow-x: hidden; }
 
         /* --- LOADERS --- */
-        #page-entrance-loader { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        #folder-loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        #page-entrance-loader, #folder-loader { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        #folder-loader { z-index: 9999; display: none; }
         .spinner { width: 45px; height: 45px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
         /* --- SIDEBAR --- */
@@ -41,7 +39,7 @@
         nav.open .nav-links li span { opacity: 1; }
         .nav-links li:hover, .nav-links li.active { background: var(--accent); color: white; }
 
-        /* --- HERO & CONTROLS --- */
+        /* --- CONTENT --- */
         main { flex: 1; margin-left: var(--sidebar-width); padding: 40px; transition: 0.4s; }
         .hero-container { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 30px; }
         .title-wrapper { display: flex; align-items: center; gap: 15px; }
@@ -55,35 +53,34 @@
         .view-btn.active { color: var(--accent); }
         .search-input { background: none; border: none; outline: none; color: var(--text-main); font-weight: 600; min-width: 180px; }
 
-        /* --- GRID & LIST DISPLAY --- */
-        .content-container { display: grid; gap: 20px; transition: 0.3s; }
+        .content-container { display: grid; gap: 15px; transition: 0.3s; }
         .mode-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
         .mode-list { grid-template-columns: 1fr; }
 
-        /* Cards */
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* Grid Styles */
-        .mode-grid .card { padding: 40px 20px; text-align: center; align-items: center; }
-        .mode-grid .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-        .mode-grid .icon-box { font-size: 3.5rem; margin-bottom: 15px; }
-        .mode-grid .action-btn { width: 100%; margin-top: 20px; padding: 14px; border-radius: 15px; font-weight: 800; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-
-        /* List Styles */
-        .mode-list .card { flex-direction: row; align-items: center; padding: 15px 25px; border-radius: 18px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; transition: 0.3s; cursor: pointer; display: flex; overflow: hidden; }
+        .mode-list .card { flex-direction: row; align-items: center; padding: 12px 25px; }
         .mode-list .icon-box { font-size: 1.5rem; margin-right: 20px; }
-        .mode-list .card-text-content { flex: 1; text-align: left; }
-        .mode-list .action-btn { width: 100px; height: 45px; margin-top: 0; border-radius: 12px; font-weight: 800; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8rem; }
+        .mode-list .card-text-content { flex: 1; }
+        .mode-list .btn-group { display: flex; gap: 10px; }
 
-        /* Labels */
-        .file-type-badge { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+        .mode-grid .card { flex-direction: column; padding: 30px 20px; text-align: center; align-items: center; }
+        .mode-grid .icon-box { font-size: 3rem; margin-bottom: 15px; }
+        .mode-grid .btn-group { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 10px; margin-top: 20px; }
 
-        /* Screens */
+        .action-btn { border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border-radius: 12px; }
+        .mode-list .action-btn { padding: 10px 15px; font-size: 0.75rem; }
+        .mode-grid .action-btn { padding: 14px; font-size: 0.8rem; }
+        .dl-btn { background: #64748b !important; }
+
+        .file-type-badge { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; display: block; }
+
+        /* --- MODALS --- */
         #file-view-screen { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; padding: 40px; overflow-y: auto; }
         #file-view-screen.active { display: block; }
-        #pdf-screen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: none; flex-direction: column; }
-        #video-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 4000; }
-        video { width: 90%; max-width: 1000px; border-radius: 20px; }
+        #media-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
+        #media-modal img, #media-modal video { max-width: 90%; max-height: 80vh; border-radius: 15px; }
+        #pdf-screen { position: fixed; inset: 0; background: var(--bg); z-index: 6000; display: none; flex-direction: column; }
+        .close-media { position: absolute; top: 30px; right: 30px; font-size: 2.5rem; color: white; cursor: pointer; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -114,47 +111,46 @@
             <div class="title-wrapper"><div class="accent-line"></div><h1 id="hero-title">My Library</h1></div>
             <div class="about-me">Pratyush • Class 10 • Age 16</div>
         </div>
-
         <div class="controls-bar">
             <div class="control-group">
-                <i class="fas fa-th-large view-btn active" onclick="toggleViewMode('grid', this)"></i>
-                <i class="fas fa-list view-btn" onclick="toggleViewMode('list', this)"></i>
+                <i class="fas fa-list view-btn active" onclick="toggleViewMode('list', this)"></i>
+                <i class="fas fa-th-large view-btn" onclick="toggleViewMode('grid', this)"></i>
             </div>
-            <div class="control-group">
-                <i class="fas fa-search" style="color:var(--text-dim)"></i>
-                <input type="text" class="search-input" placeholder="Search..." oninput="handleGlobalSearch(this.value)">
-            </div>
+            <div class="control-group"><i class="fas fa-search" style="color:var(--text-dim)"></i><input type="text" class="search-input" placeholder="Search..." oninput="handleGlobalSearch(this.value)"></div>
         </div>
-
-        <div id="main-grid" class="content-container mode-grid"></div>
+        <div id="main-grid" class="content-container mode-list"></div>
     </main>
 
     <div id="file-view-screen">
         <div onclick="closeFolder()" style="cursor:pointer; color:var(--accent); font-weight:800; margin-bottom:20px;"><i class="fas fa-arrow-left"></i> BACK</div>
         <h1 id="current-folder-title" style="margin-bottom:30px; text-align:center;"></h1>
-        
         <div class="controls-bar">
             <div class="control-group">
-                <i class="fas fa-th-large view-btn active" id="f-grid" onclick="toggleViewMode('grid', this)"></i>
-                <i class="fas fa-list view-btn" id="f-list" onclick="toggleViewMode('list', this)"></i>
+                <i class="fas fa-list view-btn active" onclick="toggleViewMode('list', this)"></i>
+                <i class="fas fa-th-large view-btn" onclick="toggleViewMode('grid', this)"></i>
             </div>
             <div class="control-group">
                 <i class="fas fa-search" style="color:var(--text-dim)"></i>
                 <input type="text" class="search-input" placeholder="Search files..." oninput="handleGlobalSearch(this.value)">
             </div>
         </div>
-
-        <div id="folder-content-display" class="content-container mode-grid"></div>
+        <div id="folder-content-display" class="content-container mode-list"></div>
     </div>
 
-    <div id="video-modal"><span onclick="closeVideo()" style="position:absolute; top:30px; right:30px; font-size:3rem; color:white; cursor:pointer;">&times;</span><video id="main-player" controls></video></div>
-    <div id="pdf-screen"><div style="padding:15px; background:var(--sidebar-bg); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;"><button onclick="closePdf()" style="font-weight:800; border:none; background:none; color:var(--text-main); cursor:pointer;">CLOSE</button><span id="pdf-title"></span></div><iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe></div>
+    <div id="media-modal"><span class="close-media" onclick="closeMedia()">&times;</span><div id="media-content"></div></div>
+    <div id="pdf-screen">
+        <div style="padding:15px; background:var(--sidebar-bg); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <button onclick="closePdf()" style="font-weight:800; border:none; background:none; color:var(--text-main); cursor:pointer;">CLOSE</button>
+            <span id="pdf-title"></span>
+        </div>
+        <iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
 
     <script>
         const USER = 'pratyushqwerty7';
         const REPO = 'myStudyMaterial';
         let releasesStore = [];
-        let viewMode = 'grid';
+        let viewMode = 'list';
         let currentFilter = 'all';
         const colors = ['#FF4D4D', '#3B82F6', '#10B981', '#FACC15', '#F97316', '#A855F7'];
 
@@ -164,30 +160,17 @@
         function toggleViewMode(mode, el) {
             viewMode = mode;
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-            el.classList.add('active');
-            
-            const containers = document.querySelectorAll('.content-container');
-            containers.forEach(c => {
-                c.className = `content-container mode-${mode}`;
-            });
+            document.querySelectorAll(`.fa-${mode === 'list' ? 'list' : 'th-large'}`).forEach(b => b.classList.add('active'));
+            document.querySelectorAll('.content-container').forEach(c => c.className = `content-container mode-${mode}`);
             renderFolders(currentFilter);
-            // Re-render folder if open
-            if(document.getElementById('file-view-screen').classList.contains('active')) {
-                const openRel = releasesStore.find(r => r.name === document.getElementById('current-folder-title').innerText);
-                if(openRel) renderFiles(openRel);
-            }
+            const openRel = releasesStore.find(r => r.name === document.getElementById('current-folder-title').innerText);
+            if(openRel) renderFiles(openRel);
         }
 
         async function fetchLibrary() {
             const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases`);
             releasesStore = await res.json();
             renderFolders('all');
-        }
-
-        function handleGlobalSearch(query) {
-            const q = query.toLowerCase();
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none');
         }
 
         function renderFolders(filter) {
@@ -200,13 +183,8 @@
                 const color = colors[Math.floor(Math.random()*colors.length)];
                 const card = document.createElement('div');
                 card.className = 'card';
-                if(viewMode === 'grid') card.style.borderTop = `6px solid ${color}`;
-                else card.style.borderLeft = `6px solid ${color}`;
-                
-                card.onclick = () => {
-                    document.getElementById('folder-loader').style.display = 'flex';
-                    setTimeout(() => { document.getElementById('folder-loader').style.display = 'none'; openFolder(rel); }, 500);
-                };
+                card.style[viewMode === 'grid' ? 'borderTop' : 'borderLeft'] = `6px solid ${color}`;
+                card.onclick = () => { document.getElementById('folder-loader').style.display = 'flex'; setTimeout(() => { document.getElementById('folder-loader').style.display = 'none'; openFolder(rel); }, 500); };
                 card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="card-text-content"><h3 style="font-weight:800;">${rel.name}</h3></div>`;
                 grid.appendChild(card);
             });
@@ -222,44 +200,41 @@
             const display = document.getElementById('folder-content-display');
             display.innerHTML = '';
             release.assets.forEach(asset => {
-                if(asset.name.endsWith('.zip')) return;
-                const isVid = asset.name.match(/\.(mp4|mkv|webm)$/i);
+                const name = asset.name.toLowerCase();
+                let type = 'file', icon = 'fa-file', badge = 'File', color = '#64748b', canView = true;
+                if (name.match(/\.(mp4|mkv|webm)$/)) { type = 'video'; icon = 'fa-video'; badge = 'Video'; color = '#3b82f6'; }
+                else if (name.endsWith('.pdf')) { type = 'pdf'; icon = 'fa-file-pdf'; badge = 'PDF'; color = '#10b981'; }
+                else if (name.match(/\.(jpg|jpeg|png|webp|gif)$/)) { type = 'image'; icon = 'fa-image'; badge = 'Image'; color = '#f97316'; }
+                else if (name.match(/\.(zip|rar|7z)$/)) { type = 'zip'; icon = 'fa-file-archive'; badge = 'Archive'; color = '#a855F7'; canView = false; }
+
                 const item = document.createElement('div');
                 item.className = 'card';
                 item.innerHTML = `
-                    <div class="icon-box" style="color:${isVid?'#3b82f6':'#10b981'}"><i class="fas ${isVid?'fa-video':'fa-file-pdf'}"></i></div>
+                    <div class="icon-box" style="color:${color}"><i class="fas ${icon}"></i></div>
                     <div class="card-text-content">
-                        <span class="file-type-badge" style="color:${isVid?'#3b82f6':'#10b981'}">${isVid?'Video Material':'PDF Document'}</span>
-                        <h3 style="font-size:1rem; font-weight:700;">${asset.name}</h3>
+                        <span class="file-type-badge" style="color:${color}">${badge}</span>
+                        <h3 style="font-size:0.9rem; font-weight:700;">${asset.name}</h3>
                     </div>
-                    <button class="action-btn" style="background:${isVid?'#3b82f6':'#10b981'}" onclick="handleFile('${asset.browser_download_url}', ${!!isVid}, '${asset.name}')">
-                        <i class="fas ${isVid?'fa-play':'fa-file-pdf'}"></i> OPEN ${isVid?'VID':'PDF'}
-                    </button>`;
+                    <div class="btn-group">
+                        ${canView ? `<button class="action-btn" style="background:${color}" onclick="event.stopPropagation(); handleFile('${asset.browser_download_url}', '${type}', '${asset.name}')"><i class="fas fa-eye"></i> VIEW</button>` : ''}
+                        <a href="${asset.browser_download_url}" download class="action-btn dl-btn" style="${!canView ? 'width:100%; grid-column: span 2;' : ''}" onclick="event.stopPropagation();"><i class="fas fa-download"></i> ${!canView ? 'DOWNLOAD' : ''}</a>
+                    </div>`;
                 display.appendChild(item);
             });
         }
 
-        async function handleFile(url, isVid, name) {
-            if(isVid) {
-                document.getElementById('video-modal').style.display = 'flex';
-                document.getElementById('main-player').src = url;
-                document.getElementById('main-player').play();
-            } else {
-                document.getElementById('pdf-title').innerText = name;
-                document.getElementById('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                document.getElementById('pdf-screen').style.display = 'flex';
-            }
+        function handleFile(url, type, name) {
+            const content = document.getElementById('media-content');
+            if (type === 'video') { content.innerHTML = `<video src="${url}" controls autoplay></video>`; document.getElementById('media-modal').style.display = 'flex'; }
+            else if (type === 'image') { content.innerHTML = `<img src="${url}" alt="${name}">`; document.getElementById('media-modal').style.display = 'flex'; }
+            else if (type === 'pdf') { document.getElementById('pdf-title').innerText = name; document.getElementById('pdf-frame').src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`; document.getElementById('pdf-screen').style.display = 'flex'; }
         }
 
-        function closeVideo() { document.getElementById('main-player').pause(); document.getElementById('video-modal').style.display = 'none'; }
+        function closeMedia() { document.getElementById('media-modal').style.display = 'none'; document.getElementById('media-content').innerHTML = ''; }
         function closePdf() { document.getElementById('pdf-screen').style.display = 'none'; }
         function closeFolder() { document.getElementById('file-view-screen').classList.remove('active'); }
-        function filterBy(tag, el) {
-            document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active'));
-            el.classList.add('active');
-            renderFolders(tag);
-        }
-
+        function filterBy(tag, el) { document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active')); el.classList.add('active'); renderFolders(tag); }
+        function handleGlobalSearch(q) { document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'); }
         fetchLibrary();
     </script>
 </body>
