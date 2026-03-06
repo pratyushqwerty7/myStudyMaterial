@@ -58,6 +58,13 @@
         .search-bar { background: none; border: none; outline: none; color: var(--text); font-weight: 600; width: 180px; }
         .sort-select { background: none; border: none; color: var(--dim); font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer; }
 
+        /* Empty State Styling */
+        .empty-msg { width: 100%; text-align: center; padding: 50px 20px; font-size: 1.5rem; font-weight: 800; color: var(--dim); opacity: 0.6; }
+
+        /* Sync Button Animation */
+        .sync-btn { cursor: pointer; transition: 0.3s; color: var(--dim); }
+        .syncing { animation: spin 1s infinite linear; color: var(--accent); }
+
         /* --- CARDS --- */
         .stage { display: grid; gap: 20px; width: 100%; }
         .stage-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
@@ -83,16 +90,15 @@
         #folder-view h2 { font-size: 2.2rem; font-weight: 900; margin-bottom: 25px; }
         .back-btn { background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer; margin-bottom:25px; display:flex; align-items:center; gap:8px; }
 
-        /* VIEWER FIX: Full screen without bezels */
+        /* VIEWER: Full screen without bezels */
         #viewer { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; }
         .viewer-box { width: 100%; height: 100vh; background: #000; position: relative; overflow: hidden; }
         .viewer-box iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .close-view { position: absolute; top: 15px; right: 25px; color: white; font-size: 3rem; cursor: pointer; z-index: 5001; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
-        /* --- MOBILE FIXES --- */
+        /* --- MOBILE --- */
         @media (max-width: 800px) {
             main { padding: 25px 15px; }
-            /* FIXED: Keep list items horizontal and organized */
             .stage-list .card { flex-direction: row; text-align: left; padding: 15px; }
             .stage-list .info { padding: 0 15px; width: auto; }
             .stage-list .actions { width: auto; justify-content: flex-end; }
@@ -134,6 +140,9 @@
             <p style="color:var(--dim); font-weight:700;">Pratyush • Digital Library</p>
         </div>
         <div class="toolbar">
+            <div class="tool-panel">
+                <i class="fas fa-sync-alt sync-btn" id="sync-icon" onclick="init()" title="Sync Vault"></i>
+            </div>
             <div class="tool-panel">
                 <i class="fas fa-list toggle-icon" id="mode-list-main" onclick="updateMode('list')"></i>
                 <i class="fas fa-th-large toggle-icon" id="mode-grid-main" onclick="updateMode('grid')"></i>
@@ -179,7 +188,6 @@
         <div class="viewer-box" id="viewer-content"></div>
     </div>
 
-
     <script>
         const API = { user: 'pratyushqwerty7', repo: 'myStudyMaterial' };
         let dataStore = [], currentMode = 'list', filterTag = 'all', activeRel = null;
@@ -196,15 +204,23 @@
             if(vaultClicks > 10) vaultClicks = 0;
         }
 
-        function showLoad() { document.getElementById('loader').style.display = 'flex'; }
-        function hideLoad() { setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 600); }
+        function showLoad() { 
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('sync-icon').classList.add('syncing');
+        }
+        function hideLoad() { 
+            setTimeout(() => { 
+                document.getElementById('loader').style.display = 'none'; 
+                document.getElementById('sync-icon').classList.remove('syncing');
+            }, 600); 
+        }
 
         async function init() {
             showLoad();
             try {
                 const resp = await fetch(`https://api.github.com/repos/${API.user}/${API.repo}/releases`);
                 dataStore = await resp.json();
-                renderMain();
+                activeRel ? renderFolder() : renderMain();
             } catch(e) { console.error("API Error"); }
             hideLoad();
         }
@@ -215,23 +231,30 @@
             if(!stage) return;
             stage.className = `stage stage-${currentMode}`;
             stage.innerHTML = '';
+
             let filtered = dataStore.filter(r => {
                 const tag = r.tag_name.toLowerCase();
                 if(filterTag === 'all') return !tag.includes('extra');
                 if(filterTag === 'extra') return tag.includes('extra');
                 return tag.includes(filterTag);
             });
-            if(sortVal === 'az') filtered.sort((a,b) => a.name.localeCompare(b.name));
-            else filtered.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-            filtered.forEach(rel => {
-                const color = palette[Math.floor(Math.random() * palette.length)];
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
-                card.onclick = () => openFolder(rel);
-                card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="info"><h3>${rel.name}</h3><small>${rel.assets.length} items in Vault</small></div>`;
-                stage.appendChild(card);
-            });
+
+            if (filtered.length === 0) {
+                stage.innerHTML = '<div class="empty-msg">☘️ nothing is here ☘️</div>';
+            } else {
+                if(sortVal === 'az') filtered.sort((a,b) => a.name.localeCompare(b.name));
+                else filtered.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+                filtered.forEach(rel => {
+                    const color = palette[Math.floor(Math.random() * palette.length)];
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
+                    card.onclick = () => openFolder(rel);
+                    card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="info"><h3>${rel.name}</h3><small>${rel.assets.length} items in Vault</small></div>`;
+                    stage.appendChild(card);
+                });
+            }
             syncIcons();
         }
 
@@ -248,24 +271,30 @@
             const sortVal = document.getElementById('folder-sort').value;
             stage.className = `stage stage-${currentMode}`;
             stage.innerHTML = '';
+
             let assets = [...activeRel.assets];
-            if(sortVal === 'az') assets.sort((a,b) => a.name.localeCompare(b.name));
-            else assets.sort((a,b) => b.size - a.size);
-            assets.forEach(asset => {
-                const meta = getMeta(asset.name), color = palette[Math.floor(Math.random() * palette.length)];
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
-                card.innerHTML = `
-                    <div class="icon-box" style="color:${color}"><i class="fas ${meta.i}"></i></div>
-                    <div class="info"><h3>${asset.name}</h3><small>${meta.t} • ${(asset.size/1048576).toFixed(2)} MB</small></div>
-                    <div class="actions">
-                        ${meta.isZip ? `<a href="${asset.browser_download_url}" class="btn btn-z"><i class="fas fa-download"></i> DOWNLOAD ZIP</a>` : 
-                        `<button class="btn btn-v" onclick="viewFile('${asset.browser_download_url}', '${meta.t}', event)">VIEW</button>
-                        <a href="${asset.browser_download_url}" class="btn btn-d"><i class="fas fa-download"></i></a>`}
-                    </div>`;
-                stage.appendChild(card);
-            });
+            if (assets.length === 0) {
+                stage.innerHTML = '<div class="empty-msg">☘️ nothing is here ☘️</div>';
+            } else {
+                if(sortVal === 'az') assets.sort((a,b) => a.name.localeCompare(b.name));
+                else assets.sort((a,b) => b.size - a.size);
+
+                assets.forEach(asset => {
+                    const meta = getMeta(asset.name), color = palette[Math.floor(Math.random() * palette.length)];
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
+                    card.innerHTML = `
+                        <div class="icon-box" style="color:${color}"><i class="fas ${meta.i}"></i></div>
+                        <div class="info"><h3>${asset.name}</h3><small>${meta.t} • ${(asset.size/1048576).toFixed(2)} MB</small></div>
+                        <div class="actions">
+                            ${meta.isZip ? `<a href="${asset.browser_download_url}" class="btn btn-z"><i class="fas fa-download"></i> DOWNLOAD ZIP</a>` : 
+                            `<button class="btn btn-v" onclick="viewFile('${asset.browser_download_url}', '${meta.t}', event)">VIEW</button>
+                            <a href="${asset.browser_download_url}" class="btn btn-d"><i class="fas fa-download"></i></a>`}
+                        </div>`;
+                    stage.appendChild(card);
+                });
+            }
             syncIcons();
         }
 
@@ -287,11 +316,9 @@
             e.stopPropagation();
             const box = document.getElementById('viewer-content'); 
             box.innerHTML = '';
-            
-            // CLEAN VIEWER: Use chrome=false and embedded=true to maximize content space
             const docViewer = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true&chrome=false`;
 
-            if (type === 'Video') {
+ if (type === 'Video') {
                 box.innerHTML = `<video src="${url}" controls autoplay style="width:100%; height:100%"></video>`;
             } else if (['PDF', 'Word', 'Excel'].includes(type)) {
                 box.innerHTML = `<iframe src="${docViewer}" frameborder="0"></iframe>`;
@@ -332,7 +359,27 @@
 
         function doSearch(s, i) {
             const q = document.getElementById(i).value.toLowerCase();
-            document.getElementById(s).querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none');
+            const cards = document.getElementById(s).querySelectorAll('.card');
+            let found = false;
+            
+            cards.forEach(c => {
+                const isMatch = c.innerText.toLowerCase().includes(q);
+                c.style.display = isMatch ? '' : 'none';
+                if(isMatch) found = true;
+            });
+
+            // Handle empty search results
+            let existingMsg = document.getElementById(s).querySelector('.empty-msg');
+            if (!found) {
+                if(!existingMsg) {
+                    const msg = document.createElement('div');
+                    msg.className = 'empty-msg';
+                    msg.innerText = '☘️ nothing is here ☘️';
+                    document.getElementById(s).appendChild(msg);
+                }
+            } else if (existingMsg) {
+                existingMsg.remove();
+            }
         }
 
         function closeFolder() { document.getElementById('folder-view').style.display = 'none'; activeRel = null; }
