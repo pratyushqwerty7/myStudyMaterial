@@ -58,12 +58,10 @@
         .search-bar { background: none; border: none; outline: none; color: var(--text); font-weight: 600; width: 180px; }
         .sort-select { background: none; border: none; color: var(--dim); font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer; }
 
-        /* Empty State Styling */
-        .empty-msg { width: 100%; text-align: center; padding: 50px 20px; font-size: 1.5rem; font-weight: 800; color: var(--dim); opacity: 0.6; }
-
-        /* Sync Button Animation */
+        /* Sync Button & Empty State */
         .sync-btn { cursor: pointer; transition: 0.3s; color: var(--dim); }
         .syncing { animation: spin 1s infinite linear; color: var(--accent); }
+        .empty-msg { width: 100%; text-align: center; padding: 50px 20px; font-size: 1.5rem; font-weight: 800; color: var(--dim); opacity: 0.6; }
 
         /* --- CARDS --- */
         .stage { display: grid; gap: 20px; width: 100%; }
@@ -90,13 +88,13 @@
         #folder-view h2 { font-size: 2.2rem; font-weight: 900; margin-bottom: 25px; }
         .back-btn { background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer; margin-bottom:25px; display:flex; align-items:center; gap:8px; }
 
-        /* VIEWER: Full screen without bezels */
+        /* FULL SCREEN VIEWER FIX */
         #viewer { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; }
         .viewer-box { width: 100%; height: 100vh; background: #000; position: relative; overflow: hidden; }
         .viewer-box iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .close-view { position: absolute; top: 15px; right: 25px; color: white; font-size: 3rem; cursor: pointer; z-index: 5001; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
-        /* --- MOBILE --- */
+        /* --- MOBILE REFINEMENTS --- */
         @media (max-width: 800px) {
             main { padding: 25px 15px; }
             .stage-list .card { flex-direction: row; text-align: left; padding: 15px; }
@@ -155,7 +153,7 @@
             </div>
             <div class="tool-panel">
                 <i class="fas fa-search" style="color:var(--dim)"></i>
-                <input type="text" class="search-bar" id="main-search" placeholder="Search resources..." oninput="doSearch('main-stage', 'main-search')">
+                <input type="text" class="search-bar" id="main-search" placeholder="Search resources..." oninput="doSearch('main-stage', 'main-search')" onkeydown="if(event.key === 'Enter') handleEasterEgg(this.value)">
             </div>
         </div>
         <div id="main-stage" class="stage"></div>
@@ -196,12 +194,25 @@
         let vaultClicks = 0;
         function handleVaultClick() {
             vaultClicks++;
-            const searchInput = document.getElementById('main-search');
-            const searchVal = searchInput ? searchInput.value : "";
+            const searchVal = document.getElementById('main-search').value;
             if(vaultClicks >= 4 && searchVal === "StudyVault-Pro | ADMIN") {
                 window.location.href = 'admin.html';
             }
             if(vaultClicks > 10) vaultClicks = 0;
+        }
+
+        // --- EASTER EGG: PERSISTENT TOKEN ---
+        function handleEasterEgg(val) {
+            if (val === "API limit") {
+                const token = prompt("Enter your GitHub Fine-grained Personal Access Token:");
+                if (token && token.startsWith("github_pat_")) {
+                    localStorage.setItem('gh_token_persistent', token);
+                    alert("Token saved successfully! You won't be asked again. Syncing...");
+                    init();
+                } else if (token) {
+                    alert("Invalid format! Fine-grained tokens usually start with 'github_pat_'.");
+                }
+            }
         }
 
         function showLoad() { 
@@ -217,18 +228,22 @@
 
         async function init() {
             showLoad();
+            const headers = {};
+            const savedToken = localStorage.getItem('gh_token_persistent');
+            if (savedToken) headers['Authorization'] = `token ${savedToken}`;
+
             try {
-                const resp = await fetch(`https://api.github.com/repos/${API.user}/${API.repo}/releases`);
+                const resp = await fetch(`https://api.github.com/repos/${API.user}/${API.repo}/releases`, { headers });
+                if (resp.status === 403) alert("Public API Limit reached! Type 'API limit' in search to add your token.");
                 dataStore = await resp.json();
                 activeRel ? renderFolder() : renderMain();
-            } catch(e) { console.error("API Error"); }
+            } catch(e) { console.error("API Error", e); }
             hideLoad();
         }
 
         function renderMain() {
             const stage = document.getElementById('main-stage');
             const sortVal = document.getElementById('main-sort').value;
-            if(!stage) return;
             stage.className = `stage stage-${currentMode}`;
             stage.innerHTML = '';
 
@@ -251,7 +266,7 @@
                     card.className = 'card';
                     card.style[currentMode === 'grid' ? 'borderTop' : 'borderLeft'] = `8px solid ${color}`;
                     card.onclick = () => openFolder(rel);
-                    card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="info"><h3>${rel.name}</h3><small>${rel.assets.length} items in Vault</small></div>`;
+                    card.innerHTML = `<div class="icon-box" style="color:${color}"><i class="fas fa-folder"></i></div><div class="info"><h3>${rel.name}</h3><small>${rel.assets.length} resources</small></div>`;
                     stage.appendChild(card);
                 });
             }
@@ -306,9 +321,8 @@
             if (n.match(/\.(mp3|wav|ogg)$/)) return { t: 'Audio', i: 'fa-headphones' };
             if (n.match(/\.(docx|doc)$/)) return { t: 'Word', i: 'fa-file-word' };
             if (n.match(/\.(xlsx|xls|csv)$/)) return { t: 'Excel', i: 'fa-file-excel' };
-            if (n.endsWith('.accdb')) return { t: 'Access', i: 'fa-database' };
-            if (n.endsWith('.txt')) return { t: 'Text', i: 'fa-file-alt' };
             if (n.match(/\.(zip|7z|rar|tar|gz)$/)) return { t: 'Archive', i: 'fa-file-archive', isZip: true };
+            if (n.endsWith('.xml')) return { t: 'XML', i: 'fa-file-code' };
             return { t: 'File', i: 'fa-file' };
         }
 
@@ -316,11 +330,12 @@
             e.stopPropagation();
             const box = document.getElementById('viewer-content'); 
             box.innerHTML = '';
+            // Chrome=false strips the Google viewer bezel
             const docViewer = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true&chrome=false`;
 
- if (type === 'Video') {
+            if (type === 'Video') {
                 box.innerHTML = `<video src="${url}" controls autoplay style="width:100%; height:100%"></video>`;
-            } else if (['PDF', 'Word', 'Excel'].includes(type)) {
+            } else if (['PDF', 'Word', 'Excel', 'XML'].includes(type)) {
                 box.innerHTML = `<iframe src="${docViewer}" frameborder="0"></iframe>`;
             } else if (type === 'Audio') {
                 box.innerHTML = `<div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; gap:20px;"><i class="fas fa-music" style="font-size:5rem"></i><audio src="${url}" controls autoplay style="width:80%"></audio></div>`;
@@ -361,14 +376,11 @@
             const q = document.getElementById(i).value.toLowerCase();
             const cards = document.getElementById(s).querySelectorAll('.card');
             let found = false;
-            
             cards.forEach(c => {
                 const isMatch = c.innerText.toLowerCase().includes(q);
                 c.style.display = isMatch ? '' : 'none';
                 if(isMatch) found = true;
             });
-
-            // Handle empty search results
             let existingMsg = document.getElementById(s).querySelector('.empty-msg');
             if (!found) {
                 if(!existingMsg) {
